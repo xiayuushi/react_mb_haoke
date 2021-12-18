@@ -9,7 +9,7 @@ import Profile from '../Profile'
 import HouseList from '../HouseList'
 
 const tabDataList = [
-  { title: '首页', icon: 'icon-ind', path: '/home/index' },
+  { title: '首页', icon: 'icon-ind', path: '/home' },
   { title: '找房', icon: 'icon-findHouse', path: '/home/list' },
   { title: '资讯', icon: 'icon-infom', path: '/home/news' },
   { title: '我的', icon: 'icon-my', path: '/home/profile' },
@@ -38,11 +38,10 @@ class Home extends Component {
     ))
   }
   render () {
-    console.log(this.props.location.pathname)
     return (
       <div className='home-container'>
         {/* 当前组件嵌套的子路由（用于展示tabbar对应的内容区） */}
-        <Route path="/home/index" component={Index} />
+        <Route path="/home" exact component={Index} />
         <Route path="/home/list" component={HouseList} />
         <Route path="/home/news" component={News} />
         <Route path="/home/profile" component={Profile} />
@@ -62,3 +61,4 @@ export default Home
 // 3、antd-mobile的tabbar组件分为内容区与tab栏，设置noRenderContent={true}可以不渲染内容区，因为当前项目的内容区会使用路由控制
 // 4、tabDataList是遍历渲染tabbar组件所需的数据（自己抽离差异化数据用于后续简化冗余代码）
 // 5、renderTabItem是自定义的方法，用于重构简化冗余代码，会根据tabDataList数据返回列表项Tab.Item组件对应的JSX结构
+// 6、默认路由必须设置exact属性进行精确匹配，因为模糊匹配时如果其他路由包含默认路由的路径，则会将默认路由对应的组件内容也一并展示出来
