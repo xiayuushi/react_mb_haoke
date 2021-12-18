@@ -1,5 +1,4 @@
-import { Button } from 'antd-mobile'
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 
 import Home from './pages/Home'
 import CityList from './pages/CityList'
@@ -7,11 +6,8 @@ import CityList from './pages/CityList'
 const App = () => (
   <Router>
     <div>
-      <h1>根组件</h1>
-      <Button>测试</Button>
-      {/* 路由入口 */}
-      <Link to="/citylist">点击去往城市列表组件</Link>
-      {/* 路由出口 */}
+      {/* 一级路由出口 */}
+      <Route path="/" exact component={Home}></Route>
       <Route path="/home" component={Home}></Route>
       <Route path="/citylist" component={CityList}></Route>
     </div>

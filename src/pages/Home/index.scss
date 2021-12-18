@@ -1,0 +1,15 @@
+.home-container {
+  height: 100%;
+  background-color: #0094ff;
+
+  .am-tab-bar {
+    .am-tabs-tab-bar-wrap {
+      position: fixed;
+      width: 100%;
+      bottom: 0;
+    }
+    .iconfont {
+      font-size: 20px;
+    }
+  }
+}

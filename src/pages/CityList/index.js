@@ -8,7 +8,7 @@ class CityList extends Component {
   render () {
     return (
       <div className='city-list-container'>
-        城市列表组件
+        当前是城市列表组件
         <Button onClick={this.goHome}>回首页</Button>
       </div>
     )
