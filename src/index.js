@@ -1,10 +1,13 @@
-import React from 'react'
+import { Component } from 'react'
 import ReactDOM from 'react-dom'
 
 import App from './App'
 import './assets/fonts/iconfont.css'
 import 'antd-mobile/dist/antd-mobile.css'
 import './index.scss'
+import request from './utils/request'
+
+Component.prototype.$request = request
 
 ReactDOM.render(<App />, document.querySelector('#root'))
 
