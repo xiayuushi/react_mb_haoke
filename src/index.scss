@@ -8,4 +8,7 @@ body {
 
 * {
   box-sizing: border-box;
+  touch-action: pan-y;
 }
+
+// 1、touch-action: pan-y;用于清除轮播图组件中chrome的阻止默认事件时的报错

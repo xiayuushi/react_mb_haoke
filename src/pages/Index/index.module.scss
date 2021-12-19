@@ -1,0 +1,13 @@
+.home-index-container {
+  height: 100vh;
+}
+
+:global(.carouse-wrap) {
+  :global(.slider-list){
+    height: 212px !important;
+  }
+}
+
+// 1、css-modules方案解决样式冲突：
+// A、带':global()'的是通用样式或者组件额外生成的样式，使用时直接写字符串类名即可 className='carouse-wrap'
+// B、不带':global()'的是有作用域的类样式，使用时应该以 css-modules文件导出对象点出类名方式使用 className={ 导出变量名.['home-index-container'] }
