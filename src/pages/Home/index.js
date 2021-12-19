@@ -2,7 +2,7 @@ import { Component } from 'react'
 import { TabBar } from 'antd-mobile'
 import { Route } from 'react-router-dom'
 
-import './index.scss'
+import styles from './index.module.scss'
 import News from '../News'
 import Index from '../Index'
 import Profile from '../Profile'
@@ -39,7 +39,7 @@ class Home extends Component {
   }
   render () {
     return (
-      <div className='home-container'>
+      <div className={styles['home-container']}>
         {/* 当前组件嵌套的子路由（用于展示tabbar对应的内容区） */}
         <Route path="/home" exact component={Index} />
         <Route path="/home/list" component={HouseList} />
@@ -62,3 +62,14 @@ export default Home
 // 4、tabDataList是遍历渲染tabbar组件所需的数据（自己抽离差异化数据用于后续简化冗余代码）
 // 5、renderTabItem是自定义的方法，用于重构简化冗余代码，会根据tabDataList数据返回列表项Tab.Item组件对应的JSX结构
 // 6、默认路由必须设置exact属性进行精确匹配，因为模糊匹配时如果其他路由包含默认路由的路径，则会将默认路由对应的组件内容也一并展示出来
+// 7、通过CSS Modules来解决可能存在的样式冲突问题
+// 7、st1 创建 [name].module.css或者创建 [name].module.scss文件
+// 7、st2 在该文件中书写样式，使用单个类名，不建议用预编译处理的嵌套语法，因为css modules生成的样式名称是全局惟一的，不需要通过嵌套来区分作用域
+// 7、st3 将 xxx.module.css 文件导入到react组件中，通过自定义变量名styles接收
+// 7、st4 在组件标签中className中使用，格式 <Xxx className={ styles.类名 } />
+// 7、st5 对于全局通用样式的类名建议使用 :global( ) 包裹起来，格式 :global(.x){...}，使用时直接按照常规类名使用，不需要用styles对象点出
+// N1、同一标签中如果同时使用多个样式，可以使用如下方式进行书写
+// D1、<Xxx className={ `iconfont ${ styles.xxx }` } />
+// D2、<Xxx className={ ['iconfont', style.xxx].join(" ") } />
+// 以上，前者'iconfont'是css modules中的使用:global()定义的全局通用样式，后者'styles.xxx'是css modules中定义的局部样式
+
