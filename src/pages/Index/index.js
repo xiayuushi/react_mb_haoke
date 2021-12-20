@@ -94,6 +94,7 @@ class Index extends Component {
   render() {
     return (
       <div className={ styles['home-index-container'] }>
+
         {/* 轮播图 */}
         <div className={ styles['carousel-wrap'] }>
           {
@@ -101,9 +102,25 @@ class Index extends Component {
             ? <Carousel autoplay infinite>{ this.renderCarousel() }</Carousel>
             : ''
           }
+        {/* 顶部导航 */}
+          <Flex className={ styles['search-wrap'] }>
+            <Flex className={ styles['search'] }>
+              <div className={ styles['location'] } onClick={ () => this.props.history.push('/citylist') }>
+                <span>上海</span>
+                <i className="iconfont icon-arrow" />
+              </div>
+              <div className={ styles['form'] } onClick={ () => this.props.history.push('/search') }>
+                <i className="iconfont icon-seach" />
+                <span>请输入小区或地址</span>
+              </div>
+            </Flex>
+            <i className={ [styles['map'], "iconfont icon-map"].join(' ') } onClick={ () => this.props.history.push('/map') } />
+          </Flex>
         </div>
+
         {/* 菜单导航 */}
         <Flex>{ this.renderNavs() }</Flex>
+
         {/* 租房小组 */}
         <div className={ styles['group-wrap'] }>
           <div className={ styles['theme'] }>
@@ -112,11 +129,13 @@ class Index extends Component {
           </div>
           <Grid data={ this.state.groups } activeStyle columnNum={ 2 } hasLine={ false } square={ false } renderItem={ this.renderGroupContent } />
         </div>
+
         {/* 最新资讯 */}
         <div className={ styles['news-wrap'] }>
           <h2>最新资讯</h2>
           <WingBlank size='md'>{ this.renderNews() }</WingBlank>
         </div>
+
       </div>
     );
   }
@@ -133,3 +152,7 @@ export default Index
 // 3、A：之前在Home组件中实现tabbar的逻辑时，只考虑到了第一次加载Home组件以及点击tabbar的情况，暂没考虑到不重新加载Home不点击tabbar但路由切换的情况
 // 3、S：在Home组件中通过componentDidUpdate钩子函数去监听路由切换，重新更新state，让数据驱动视图更新
 // 4、antd-mobile中的Grid组件renderItem属性的值是一个回调，用于渲染JSX结构，该回调第一个形参可以获取每一项用于渲染的数据，即renderItem={(item,index)=>{return JSX}}
+// 5、某个元素上同时具备css-modules的类样式与通用样式，可以写成数组join()拼接的形式
+// 5、例如 className={ [styles['xxx'], 'active'].join(' ') } 
+// 5、此处 示例styles['xxx']是css-modules的样式，而'active'是通用样式（或者是css-modules使用:global()定义的全局通用类样式）
+// 5、注意：css-modules的样式需要通过变量对象点出，常规类样式或者css-modules的全局类样式不需要通过变量对象点出
