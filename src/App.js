@@ -7,9 +7,9 @@ const App = () => (
   <Router>
     <div className="App-container">
       {/* 一级路由出口 */}
-      <Route path="/" exact render={()=>(<Redirect to="/home" />)} />
-      <Route path="/home" component={Home} />
-      <Route path="/citylist" component={CityList} />
+      <Route path="/" exact render={ () => (<Redirect to="/home" />) } />
+      <Route path="/home" component={ Home } />
+      <Route path="/citylist" component={ CityList } />
     </div>
   </Router>
 )

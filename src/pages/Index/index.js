@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { Carousel, Flex, Grid } from 'antd-mobile'
+import { Carousel, Flex, Grid, WingBlank } from 'antd-mobile'
 import styles from './index.module.scss'
 
 import navImg1 from '../../assets/navs/nav-1.png'
@@ -18,6 +18,7 @@ class Index extends Component {
   state = {
     swipers: [],
     groups: [],
+    news: [],
     isSwipers: false
   }
 
@@ -31,9 +32,15 @@ class Index extends Component {
     this.setState(() => ({ groups: body }))
   }
 
+  getNews = async (area = 'AREA%7C88cff55c-aaa4-e2e0') => {
+    const { body } = await this.$request('/home/news', 'get', { area } )
+    this.setState(() => ({ news: body }))
+  }
+
   componentDidMount() {
     this.getSwipers()
     this.getGroups()
+    this.getNews()
   }
 
   renderCarousel = () => {
@@ -46,9 +53,9 @@ class Index extends Component {
 
   renderNavs = () => {
     return navDataList.map(v => (
-      <Flex.Item key={v.id} onClick={ () => this.props.history.push(v.path) }>
-        <img src={v.img} alt="" />
-        <p>{v.title}</p>
+      <Flex.Item key={ v.id } onClick={ () => this.props.history.push(v.path) }>
+        <img src={ v.img } alt="" />
+        <p>{ v.title }</p>
       </Flex.Item>
     ))
   }
@@ -56,21 +63,39 @@ class Index extends Component {
   renderGroupContent = (item) => {
     return (
       <Flex>
-        <Flex.Item className={styles['group-item']} key={item.id}>
-          <div className={styles['content']}>
-            <h2 className={styles['title']}>{item.title}</h2>
-            <p className={styles['desc']}>{item.desc}</p>
+        <Flex.Item className={ styles['group-item'] } key={ item.id }>
+          <div className={ styles['content'] }>
+            <h2 className={ styles['title'] }>{ item.title }</h2>
+            <p className={ styles['desc'] }>{ item.desc }</p>
           </div>
-          <img src={process.env.REACT_APP_URL+item.imgSrc} alt="" />
+          <img src={ process.env.REACT_APP_URL + item.imgSrc } alt="" />
         </Flex.Item>
       </Flex>
     )
   }
+
+  renderNews = () => {
+    return (
+      this.state.news.map(v => (
+        <Flex className={ styles['news-item'] } key={ v.id }>
+          <img className={ styles['img'] } src={ process.env.REACT_APP_URL + v.imgSrc } alt="" />
+          <Flex className={ styles['content'] } direction="column" justify="between" align="start">
+            <p className={ styles['title'] }>{ v.title }</p>
+            <Flex className={ styles['desc'] } justify="between">
+              <span>{ v.from }</span>
+              <span>{ v.date }</span>
+            </Flex>
+          </Flex>
+        </Flex>
+      ))
+    )
+  }
+
   render() {
     return (
-      <div className={styles['home-index-container']}>
+      <div className={ styles['home-index-container'] }>
         {/* 轮播图 */}
-        <div className={styles['carousel-wrap']}>
+        <div className={ styles['carousel-wrap'] }>
           {
             this.state.isSwipers 
             ? <Carousel autoplay infinite>{ this.renderCarousel() }</Carousel>
@@ -80,12 +105,17 @@ class Index extends Component {
         {/* 菜单导航 */}
         <Flex>{ this.renderNavs() }</Flex>
         {/* 租房小组 */}
-        <div className={styles['group-wrap']}>
-          <div className={styles['group-title']}>
+        <div className={ styles['group-wrap'] }>
+          <div className={ styles['theme'] }>
             <h2>租房小组</h2>
             <span>更多</span>
           </div>
-          <Grid data={this.state.groups} activeStyle columnNum={2} hasLine={false} square={false} renderItem={this.renderGroupContent} />
+          <Grid data={ this.state.groups } activeStyle columnNum={ 2 } hasLine={ false } square={ false } renderItem={ this.renderGroupContent } />
+        </div>
+        {/* 最新资讯 */}
+        <div className={ styles['news-wrap'] }>
+          <h2>最新资讯</h2>
+          <WingBlank size='md'>{ this.renderNews() }</WingBlank>
         </div>
       </div>
     );

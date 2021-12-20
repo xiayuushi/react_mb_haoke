@@ -1,9 +1,8 @@
 .home-container {
-  height: 100%;
+  padding-bottom: 2.5rem;
   
+  // tabbar栏
   :global(.am-tab-bar) {
-    height: 2.5rem !important;
-
     :global(.am-tabs-tab-bar-wrap) {
       position: fixed;
       bottom: 0;

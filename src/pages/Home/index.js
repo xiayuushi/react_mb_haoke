@@ -29,10 +29,10 @@ class Home extends Component {
   renderTabItem = () => {
     return tabDataList.map(v => (
       <TabBar.Item
-        title={v.title}
-        key={v.icon}
-        icon={<i className={`iconfont ${v.icon}`} />}
-        selectedIcon={<i className={`iconfont ${v.icon}`} />}
+        title={ v.title }
+        key={ v.icon }
+        icon={ <i className={`iconfont ${v.icon}` } />}
+        selectedIcon={ <i className={ `iconfont ${v.icon}` } />}
         selected={this.state.selectedTab === v.path}
         onPress={() => {
           this.setState({
@@ -45,15 +45,15 @@ class Home extends Component {
   }
   render () {
     return (
-      <div className={styles['home-container']}>
+      <div className={ styles['home-container'] }>
         {/* 当前组件嵌套的子路由（用于展示tabbar对应的内容区） */}
-        <Route path="/home" exact component={Index} />
-        <Route path="/home/list" component={HouseList} />
-        <Route path="/home/news" component={News} />
-        <Route path="/home/profile" component={Profile} />
+        <Route path="/home" exact component={ Index } />
+        <Route path="/home/list" component={ HouseList } />
+        <Route path="/home/news" component={ News } />
+        <Route path="/home/profile" component={ Profile } />
         {/* tabbar */}
-        <TabBar unselectedTintColor="#888" tintColor="#21b97a" noRenderContent={true}>
-          {this.renderTabItem()}                       
+        <TabBar unselectedTintColor="#888" tintColor="#21b97a" noRenderContent={ true }>
+        { this.renderTabItem() }                       
         </TabBar> 
       </div>
     )
