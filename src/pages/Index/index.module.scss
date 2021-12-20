@@ -2,9 +2,16 @@
   height: 100vh;
 }
 
-:global(.carouse-wrap) {
-  :global(.slider-list){
-    height: 212px !important;
+.carousel-wrap {
+  height: 212px;
+}
+
+:global(.am-flexbox-item) {
+  padding: 10px 0;
+  text-align: center;
+  img {
+    width: 48px;
+    height: 48px;
   }
 }
 
