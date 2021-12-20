@@ -53,8 +53,8 @@ class Home extends Component {
         <Route path="/home/profile" component={Profile} />
         {/* tabbar */}
         <TabBar unselectedTintColor="#888" tintColor="#21b97a" noRenderContent={true}>
-         {this.renderTabItem()}                       
-        </TabBar>           
+          {this.renderTabItem()}                       
+        </TabBar> 
       </div>
     )
   }

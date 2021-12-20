@@ -1,15 +1,18 @@
 .home-index-container {
   background-color: #fff;
   .carousel-wrap {
-    height: 212px;
+    height: 10.6rem;
+    a {
+      height: 100% !important;
+    }
   }
 
   :global(.am-flexbox-item) {
-    padding: 10px 0;
+    padding: .5rem 0;
     text-align: center;
     img {
-      width: 48px;
-      height: 48px;
+      width: 2.4rem;
+      height: 2.4rem;
     }
   }
 
@@ -19,24 +22,24 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 20px;
+      padding: .5rem 1rem;
       h2 {
         font-weight: 600;
-        font-size: 16px;
+        font-size: .8rem;
       }
     }
 
     :global(.am-grid) {
-      padding: 0 10px;
+      padding: 0 .5rem;
       :global(.am-flexbox) {
         background-color: inherit;
-        padding-bottom: 10px;
+        padding-bottom: .5rem;
         :global(.am-flexbox-item.am-grid-item) {
           background-color: #fff;
-          height: 80px;
-          margin: 0px;
+          height: 4rem;
+          margin: 0;
           &:first-child {
-            margin-right: 10px;
+            margin-right: .5rem;
           }
         }
       }
@@ -46,18 +49,18 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0 10px;
+      padding: 0 .5rem;
       .content {
         display: flex;
         flex-direction: column;
       }
       .title {
         font-weight: 600;
-        font-size: 14px;
+        font-size: .7rem;
       }
       .desc {
         color: #ccc;
-        padding-top: 10px;
+        padding-top: .5rem;
       }
     }
   }

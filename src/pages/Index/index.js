@@ -38,7 +38,7 @@ class Index extends Component {
 
   renderCarousel = () => {
     return this.state.swipers.map(v => (
-        <a key={v.id} href="" style={{ display: 'inline-block', width: '100%', height: 212 }}>
+        <a key={v.id} href="" style={{ display: 'inline-block', width: '100%' }}>
           <img src={process.env.REACT_APP_URL+v.imgSrc} alt="" style={{ width: '100%', verticalAlign: 'top' }} />
         </a>
     ))

@@ -6,6 +6,7 @@ import './assets/fonts/iconfont.css'
 import 'antd-mobile/dist/antd-mobile.css'
 import './index.scss'
 import request from './utils/request'
+import './utils/root'
 
 Component.prototype.$request = request
 
