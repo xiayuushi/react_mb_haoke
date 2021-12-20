@@ -68,3 +68,6 @@ export default Index
 // 2、Q：antd-mobile（v2版本）的Carousel组件存在两个问题：轮播图不会自动加载、从其他路由返回时高度会丢失
 // 2、A：造成Carousel以上两个的原因是：轮播图数据是动态加载的，一开始数据是空的，加载完成前后数量不一致导致的
 // 2、S：在state中添加一个布尔值数据isSwipers，当轮播图加载完成时设置该布尔值为true，该值为true时再渲染组件
+// 3、Q：点击导航菜单，导航到 /home/list 路由对应的HouseList组件时，下方tabbar并没有进行同步高亮显示
+// 3、A：之前在Home组件中实现tabbar的逻辑时，只考虑到了第一次加载Home组件以及点击tabbar的情况，暂没考虑到不重新加载Home不点击tabbar但路由切换的情况
+// 3、S：在Home组件中通过componentDidUpdate钩子函数去监听路由切换，重新更新state，让数据驱动视图更新

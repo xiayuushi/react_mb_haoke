@@ -19,22 +19,28 @@ class Home extends Component {
   state = {
     selectedTab: this.props.location.pathname
   }
+
+  componentDidUpdate (prevProps) {
+    if (prevProps.location.pathname !== this.props.location.pathname) {
+      this.setState(() => ({ selectedTab: this.props.location.pathname }))
+    }
+  }
+
   renderTabItem = () => {
     return tabDataList.map(v => (
       <TabBar.Item
-      title={v.title}
-      key={v.icon}
-      icon={<i className={`iconfont ${v.icon}`} />}
-      selectedIcon={<i className={`iconfont ${v.icon}`} />}
-      selected={this.state.selectedTab === v.path}
-      onPress={() => {
-        this.setState({
-          selectedTab: v.path,
-        })
-        this.props.history.push(v.path)
-      }}
-    >
-    </TabBar.Item>
+        title={v.title}
+        key={v.icon}
+        icon={<i className={`iconfont ${v.icon}`} />}
+        selectedIcon={<i className={`iconfont ${v.icon}`} />}
+        selected={this.state.selectedTab === v.path}
+        onPress={() => {
+          this.setState({
+            selectedTab: v.path,
+          })
+          this.props.history.push(v.path)
+        }}>
+      </TabBar.Item>
     ))
   }
   render () {
@@ -68,7 +74,10 @@ export default Home
 // 7、st3 将 xxx.module.css 文件导入到react组件中，通过自定义变量名styles接收
 // 7、st4 在组件标签中className中使用，格式 <Xxx className={ styles.类名 } />
 // 7、st5 对于全局通用样式的类名建议使用 :global( ) 包裹起来，格式 :global(.x){...}，使用时直接按照常规类名使用，不需要用styles对象点出
-// N1、同一标签中如果同时使用多个样式，可以使用如下方式进行书写
-// D1、<Xxx className={ `iconfont ${ styles.xxx }` } />
-// D2、<Xxx className={ ['iconfont', style.xxx].join(" ") } />
+// 8、componentDidUpdate钩子函数可以监听类组件中props与state的变化，因此该钩子的作用类似于vue中的watch侦听器
+// 8、componentDidUpdate钩子函数中去更新state状态，数据驱动视图更新时必须将更新代码写在判断语句中，否则会触发递归更新导致栈溢出
+// 9、prevProps.location.pathname !== this.props.location.pathname 此时componentDidUpdate监听到了路由变化
+// 10、同一标签中如果同时使用多个样式，可以使用如下方式进行书写
+// 10、1 <Xxx className={ `iconfont ${ styles.xxx }` } />
+// 10、2 <Xxx className={ ['iconfont', style.xxx].join(" ") } />
 // 以上，前者'iconfont'是css modules中的使用:global()定义的全局通用样式，后者'styles.xxx'是css modules中定义的局部样式
