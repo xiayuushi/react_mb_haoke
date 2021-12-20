@@ -5,7 +5,7 @@ import CityList from './pages/CityList'
 
 const App = () => (
   <Router>
-    <div>
+    <div className="App-container">
       {/* 一级路由出口 */}
       <Route path="/" exact render={()=>(<Redirect to="/home" />)} />
       <Route path="/home" component={Home} />
