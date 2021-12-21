@@ -1,0 +1,16 @@
+.city-list-container {
+  background-color: #fff;
+  height: 100%;
+  .navbar {
+    height: 2.25rem;
+    background-color: #f6f5f6;
+    :global(.am-navbar-title) {
+      font-size: .9rem;
+      color: #333;
+    }
+    :global(.icon-back) {
+      font-size: .8rem;
+      color: #333;
+    }
+  }
+}

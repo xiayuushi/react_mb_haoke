@@ -167,4 +167,4 @@ export default Index
 // 5、此处 示例styles['xxx']是css-modules的样式，而'active'是通用样式（或者是css-modules使用:global()定义的全局通用类样式）
 // 5、注意：css-modules的样式需要通过变量对象点出，常规类样式或者css-modules的全局类样式不需要通过变量对象点出
 // 6、react项目中获取全局变量必须通过window对象访问，BMap是通过静态页导入挂载到window对象上的百度sdk对象，因此必须通过window.BMap去访问该对象
-// 7、BMap.LocalCity()是百度地图提供的IP定位，调用该方法会生成一个对象，通过该对象的get()可以在回调形参中获取当前的城市，即BMap.LocalCity.get(res=>形参res就可以获取当前IP定位的城市)
+// 7、BMap.LocalCity()是百度地图提供的IP定位，调用该方法会生成一个对象，通过该对象的get()可以在回调形参中获取当前的城市，即BMap.LocalCity().get(res=>形参res就可以获取当前IP定位的城市)
