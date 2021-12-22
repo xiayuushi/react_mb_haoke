@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { NavBar } from 'antd-mobile'
+import { getCurrentCity } from '../../utils/citydata'
 import styles from './index.module.scss'
 
 const processCityData = (cityList) => {
@@ -28,12 +29,12 @@ class CityList extends Component {
     const { body } = await this.$request('/area/city', 'get', { level })
     const { cityListData, cityIndexList } = processCityData(body)
     const { body: result } = await this.$request('/area/hot')
+
     cityListData['hot'] = result
     cityIndexList.unshift('hot')
-    console.log(cityListData)
-    console.log('===========')
-    console.log(cityIndexList)
-    // this.setState(() => ({ cityList: body }))
+
+    const { label: currentCityName } = await getCurrentCity()
+    console.log(currentCityName)
   }
   componentDidMount () {
     this.getCityList()

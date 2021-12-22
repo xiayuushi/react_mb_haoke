@@ -1,6 +1,7 @@
 import { Component } from 'react'
 import { Carousel, Flex, Grid, WingBlank } from 'antd-mobile'
 import styles from './index.module.scss'
+import { getCurrentCity } from '../../utils/citydata'
 
 import navImg1 from '../../assets/navs/nav-1.png'
 import navImg2 from '../../assets/navs/nav-2.png'
@@ -20,7 +21,7 @@ class Index extends Component {
     groups: [],
     news: [],
     isSwipers: false,
-    currentCity: '深圳'
+    currentCityName: '深圳'
   }
 
   getSwipers = async () => {
@@ -38,19 +39,16 @@ class Index extends Component {
     this.setState(() => ({ news: body }))
   }
 
-  getCurrentCity = () => {
-    const localCity = new window.BMap.LocalCity()
-    localCity.get(async ({ name }) => {
-      const { body } = await this.$request('/area/info', 'get', { name })
-      this.setState(() => ({ currentCity: body.label }))
-    })
+  getCurrentCityName = async () => {
+    const { label } = await getCurrentCity()
+    this.setState(() => ({ currentCityName: label }))
   }
 
   componentDidMount() {
     this.getSwipers()
     this.getGroups()
     this.getNews()
-    this.getCurrentCity()
+    this.getCurrentCityName()
   }
 
   renderCarousel = () => {
@@ -116,7 +114,7 @@ class Index extends Component {
           <Flex className={ styles['search-wrap'] }>
             <Flex className={ styles['search'] }>
               <div className={ styles['location'] } onClick={ () => this.props.history.push('/citylist') }>
-                <span>{ this.state.currentCity }</span>
+                <span>{ this.state.currentCityName }</span>
                 <i className="iconfont icon-arrow" />
               </div>
               <div className={ styles['form'] } onClick={ () => this.props.history.push('/search') }>
@@ -166,5 +164,3 @@ export default Index
 // 5、例如 className={ [styles['xxx'], 'active'].join(' ') } 
 // 5、此处 示例styles['xxx']是css-modules的样式，而'active'是通用样式（或者是css-modules使用:global()定义的全局通用类样式）
 // 5、注意：css-modules的样式需要通过变量对象点出，常规类样式或者css-modules的全局类样式不需要通过变量对象点出
-// 6、react项目中获取全局变量必须通过window对象访问，BMap是通过静态页导入挂载到window对象上的百度sdk对象，因此必须通过window.BMap去访问该对象
-// 7、BMap.LocalCity()是百度地图提供的IP定位，调用该方法会生成一个对象，通过该对象的get()可以在回调形参中获取当前的城市，即BMap.LocalCity().get(res=>形参res就可以获取当前IP定位的城市)
