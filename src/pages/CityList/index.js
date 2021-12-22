@@ -1,7 +1,18 @@
 import { Component } from 'react'
 import { NavBar } from 'antd-mobile'
 import { getCurrentCity } from '../../utils/citydata'
+import { List, AutoSizer } from 'react-virtualized'
 import styles from './index.module.scss'
+
+const list = Array(100).fill('测试')
+
+const rowRenderer = ({ key, index, isScrolling,  isVisible,  style, }) => {
+  return (
+    <div key={key} style={style}>
+      {list[index]}
+    </div>
+  )
+}
 
 const processCityData = (cityList) => {
   const cityListData = {}
@@ -28,13 +39,14 @@ class CityList extends Component {
   getCityList = async (level = 1) => {
     const { body } = await this.$request('/area/city', 'get', { level })
     const { cityListData, cityIndexList } = processCityData(body)
-    const { body: result } = await this.$request('/area/hot')
+    const { body: hotCityList } = await this.$request('/area/hot')
 
-    cityListData['hot'] = result
+    cityListData['hot'] = hotCityList
     cityIndexList.unshift('hot')
 
-    const { label: currentCityName } = await getCurrentCity()
-    console.log(currentCityName)
+    const currentCity = await getCurrentCity()
+    cityListData['#'] = [currentCity]
+    cityIndexList.unshift('#')
   }
   componentDidMount () {
     this.getCityList()
@@ -52,6 +64,17 @@ class CityList extends Component {
         >城市选择</NavBar>
 
         {/* 内容区 */}
+        <AutoSizer>
+        {({ width, height }) => (
+          <List
+            width={ width }
+            height={ height }
+            rowCount={ list.length }
+            rowHeight={ 20 }
+            rowRenderer={ rowRenderer }
+         />)
+        }
+        </AutoSizer> 
       </div>
     )
   }
@@ -75,3 +98,13 @@ export default CityList
 // 6、cityListData['hot'] = result 表示往对象cityListData添加一个hot字段，值result是一个数组
 // 7、cityIndexList.unshift('hot') 表示往数组前面插入一个'hot'字段，作为cityListData['hot']的索引
 // 8、cityIndexList数组与cityListData对象是对应的关系，通过数组索引可以查询到对象中对应的数据
+// 9、react-virtualized适用于可视区加载，通过可视区来加载数据比懒加载性能要高，适用于大量数据的列表或者表格组件，它比懒加载更加高性能的地方是在于它不会操作多余的dom
+// 10、react-virtualized的使用流程
+// 10、st1 安装react-virtualized
+// 10、st2 将react-virtualized的样式导入到入口（导入一次，后续不需要在使用组件的地方再次导入）
+// 10、st3 在需要使用react-virtualized组件的地方导入相应的使用到的组件（例如List、AutoSizer等）
+
+// N1、react-virtualized中的List组件就是用于渲染的列表组件，它有5个必选属性width、height、rowCount、rowHeight、rowRenderer
+// N2、react-virtualized中的List组件需要与AutoSizer高阶组件配合使用（AutoSizer用于做List组件与页面容器的自适应）
+// N3、List组件必选属性width（每行宽度）、height（每行高度）、rowCount（行数）、rowHeight（每行行高）、rowRenderer（渲染出的遍历的内容，值是一个函数，函数返回JSX结构）
+// N4、AutoSizer是个高阶组件，内部使用到了render-props模式，可以通过解构width与height的方式将获取到的页面容器宽高设置给List组件的整体宽高，让List组件整体宽高与容器做适配

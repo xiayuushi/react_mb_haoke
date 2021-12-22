@@ -1,8 +1,12 @@
 .city-list-container {
   background-color: #fff;
   height: 100%;
+  padding-top: 2.25rem;
+
   .navbar {
     height: 2.25rem;
+    margin-top: -2.25rem;
+
     background-color: #f6f5f6;
     :global(.am-navbar-title) {
       font-size: .9rem;
@@ -14,3 +18,7 @@
     }
   }
 }
+
+// 1、.city-list-container必须 height: 100%; 否则react-virtualized的List组件不能占满高度
+// 2、.city-list-container必须 挤出顶部导航栏高度，否则顶部导航栏会随下方内容List组件一起滚动（此时List组件的高度与整体容器高度一致）
+// 2、因此 .city-list-container { height: 100% } 然后让导航栏往上走个负margin-top（值为导航栏高度值），即 .navbar { margin-top: -2.25rem }
