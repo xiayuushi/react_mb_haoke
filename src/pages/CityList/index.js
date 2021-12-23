@@ -4,6 +4,9 @@ import { getCurrentCity } from '../../utils/citydata'
 import { List, AutoSizer } from 'react-virtualized'
 import styles from './index.module.scss'
 
+const TITLE_HEIGHT = 20 
+const CITY_HEIGHT = 40
+
 const processCityData = (cityList) => {
   const cityListData = {}
 
@@ -25,10 +28,12 @@ const processCityData = (cityList) => {
 class CityList extends Component {
   state = {
     cityListData: {},
-    cityIndexList: []
+    cityIndexList: [],
+    activeIndex: 0
   }
 
   rowRenderer = ({ key, index, isScrolling,  isVisible,  style }) => {
+    // this.setState({ activeIndex: index})
     const letter = this.state.cityIndexList[index]
     const format = (letter) => {
       switch (letter) {
@@ -43,9 +48,18 @@ class CityList extends Component {
     return (
       <div className={ styles['row'] } key={key} style={style}>
         <div className={ styles['title'] }>{ format(letter) }</div>
-        <div className={ styles['city'] }>深圳</div>
+        {
+          this.state.cityListData[letter].map(v => 
+            (<div className={ styles['city'] } key={ v.value }>{ v.label }</div>)
+          )
+        }
       </div>
     )
+  }
+
+  rowHeight = ({ index }) => {
+    const { cityListData, cityIndexList } = this.state
+    return TITLE_HEIGHT + CITY_HEIGHT * cityListData[cityIndexList[index]].length
   }
 
   getCityList = async (level = 1) => {
@@ -65,9 +79,27 @@ class CityList extends Component {
       cityIndexList
     }))
   }
+
+  renderRightIndex = () => {
+    const clickHandler = (i) => {
+      console.log(i)
+      this.setState(() => ({ activeIndex: i }))
+    }
+    return (
+      this.state.cityIndexList.map((v, i) => (
+        <li className={ styles['li'] } key={ v } onClick={ ()=>clickHandler(i) }>
+          <span className={ i === this.state.activeIndex ? styles['active'] : '' }>
+            { v==='hot'? '热': v.toUpperCase() }
+          </span>
+        </li>
+      ))
+    )
+  }
+
   componentDidMount () {
     this.getCityList()
   }
+
   render () {
     return (
       <div className={ styles['city-list-container'] }>
@@ -80,18 +112,23 @@ class CityList extends Component {
           onLeftClick={() => this.props.history.go(-1)}
         >城市选择</NavBar>
 
-        {/* 内容区 */}
+        {/* 内容区 左侧城市列表 */}
         <AutoSizer>
         {({ width, height }) => (
           <List
             width={ width }
             height={ height }
             rowCount={ this.state.cityIndexList.length }
-            rowHeight={ 60 }
+            rowHeight={ this.rowHeight }
             rowRenderer={ this.rowRenderer }
           />)
         }
         </AutoSizer> 
+
+        {/* 内容区 右侧字母 */}
+        <ul className={ styles['ul'] }>
+          { this.renderRightIndex() }
+        </ul>
       </div>
     )
   }
@@ -126,5 +163,7 @@ export default CityList
 // N3、List组件必选属性width（整体宽度）、height（整体高度）、rowCount（行数）、rowHeight（每行行高）、rowRenderer（渲染出的遍历的内容，值是一个函数，函数返回JSX结构）
 // N4、List组件属性width（整体宽度）取决于AutoSizer组件获取的页面容器宽度、height（整体高度）取决于AutoSizer组件获取的页面容器高度
 // N4、List组件属性rowCount（行数）取决于遍历数组的长度、rowHeight（每行行高）需要根据内容进行计算，通常不会直接写成数值类型，而是需要定义为函数进行计算
+// N4、List组件属性rowHeight如果值是函数时，其自带一个参数对象，可从参数对象中解构出index用于记录当前行的索引
+// N4、城市列表行高 = 固定的数量1个标题 + 不固定的数量的若干城市名（即 rowheight= 标体高度 + 单个城市高度 * 城市数量 ）
 // N5、AutoSizer是个高阶组件，内部使用到了render-props模式，可以通过解构width与height的方式将获取到的页面容器宽高设置给List组件的整体宽高，让List组件整体宽高与容器做适配
 // N6、因为rowRenderer需要使用到类组件state状态中的数据，因此必须将其从类组件外部移到类组件内部，这样子才能使用类组件state中的数据
