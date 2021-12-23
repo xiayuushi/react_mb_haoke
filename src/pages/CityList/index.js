@@ -4,16 +4,6 @@ import { getCurrentCity } from '../../utils/citydata'
 import { List, AutoSizer } from 'react-virtualized'
 import styles from './index.module.scss'
 
-const list = Array(100).fill('测试')
-
-const rowRenderer = ({ key, index, isScrolling,  isVisible,  style, }) => {
-  return (
-    <div key={key} style={style}>
-      {list[index]}
-    </div>
-  )
-}
-
 const processCityData = (cityList) => {
   const cityListData = {}
 
@@ -34,8 +24,30 @@ const processCityData = (cityList) => {
 
 class CityList extends Component {
   state = {
-    cityList: []
+    cityListData: {},
+    cityIndexList: []
   }
+
+  rowRenderer = ({ key, index, isScrolling,  isVisible,  style }) => {
+    const letter = this.state.cityIndexList[index]
+    const format = (letter) => {
+      switch (letter) {
+        case '#':
+          return '当前城市'
+        case 'hot':
+          return '热门城市'
+        default:
+          return letter.toUpperCase()
+      }
+    }
+    return (
+      <div className={ styles['row'] } key={key} style={style}>
+        <div className={ styles['title'] }>{ format(letter) }</div>
+        <div className={ styles['city'] }>深圳</div>
+      </div>
+    )
+  }
+
   getCityList = async (level = 1) => {
     const { body } = await this.$request('/area/city', 'get', { level })
     const { cityListData, cityIndexList } = processCityData(body)
@@ -47,6 +59,11 @@ class CityList extends Component {
     const currentCity = await getCurrentCity()
     cityListData['#'] = [currentCity]
     cityIndexList.unshift('#')
+
+    this.setState(() => ({
+      cityListData,
+      cityIndexList
+    }))
   }
   componentDidMount () {
     this.getCityList()
@@ -69,10 +86,10 @@ class CityList extends Component {
           <List
             width={ width }
             height={ height }
-            rowCount={ list.length }
-            rowHeight={ 20 }
-            rowRenderer={ rowRenderer }
-         />)
+            rowCount={ this.state.cityIndexList.length }
+            rowHeight={ 60 }
+            rowRenderer={ this.rowRenderer }
+          />)
         }
         </AutoSizer> 
       </div>
@@ -106,5 +123,8 @@ export default CityList
 
 // N1、react-virtualized中的List组件就是用于渲染的列表组件，它有5个必选属性width、height、rowCount、rowHeight、rowRenderer
 // N2、react-virtualized中的List组件需要与AutoSizer高阶组件配合使用（AutoSizer用于做List组件与页面容器的自适应）
-// N3、List组件必选属性width（每行宽度）、height（每行高度）、rowCount（行数）、rowHeight（每行行高）、rowRenderer（渲染出的遍历的内容，值是一个函数，函数返回JSX结构）
-// N4、AutoSizer是个高阶组件，内部使用到了render-props模式，可以通过解构width与height的方式将获取到的页面容器宽高设置给List组件的整体宽高，让List组件整体宽高与容器做适配
+// N3、List组件必选属性width（整体宽度）、height（整体高度）、rowCount（行数）、rowHeight（每行行高）、rowRenderer（渲染出的遍历的内容，值是一个函数，函数返回JSX结构）
+// N4、List组件属性width（整体宽度）取决于AutoSizer组件获取的页面容器宽度、height（整体高度）取决于AutoSizer组件获取的页面容器高度
+// N4、List组件属性rowCount（行数）取决于遍历数组的长度、rowHeight（每行行高）需要根据内容进行计算，通常不会直接写成数值类型，而是需要定义为函数进行计算
+// N5、AutoSizer是个高阶组件，内部使用到了render-props模式，可以通过解构width与height的方式将获取到的页面容器宽高设置给List组件的整体宽高，让List组件整体宽高与容器做适配
+// N6、因为rowRenderer需要使用到类组件state状态中的数据，因此必须将其从类组件外部移到类组件内部，这样子才能使用类组件state中的数据
