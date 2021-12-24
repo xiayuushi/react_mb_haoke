@@ -1,5 +1,5 @@
 import { Component, createRef } from 'react'
-import { NavBar } from 'antd-mobile'
+import { NavBar, Toast } from 'antd-mobile'
 import { getCurrentCity } from '../../utils/citydata'
 import { List, AutoSizer } from 'react-virtualized'
 import styles from './index.module.scss'
@@ -66,12 +66,20 @@ class CityList extends Component {
           return letter.toUpperCase()
       }
     }
+    const changeCity = (currentChangeCityData) => {
+      const hasHouseCityList = ['北京', '上海', '广州', '深圳']
+      if (!hasHouseCityList.includes(currentChangeCityData.label)) {
+        return Toast.offline('当前城市暂无房源', 1, null, true)
+      }
+      localStorage.setItem('hkzf_city', JSON.stringify(currentChangeCityData))
+      this.props.history.go(-1)
+    }
     return (
       <div className={ styles['row'] } key={key} style={style}>
         <div className={ styles['title'] }>{ format(letter) }</div>
         {
           this.state.cityListData[letter].map(v => 
-            (<div className={ styles['city'] } key={ v.value }>{ v.label }</div>)
+            (<div className={ styles['city'] } key={ v.value } onClick={ () => changeCity(v) }>{ v.label }</div>)
           )
         }
       </div>

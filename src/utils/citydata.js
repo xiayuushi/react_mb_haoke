@@ -3,7 +3,7 @@ export const getCurrentCity = () => {
   const localCity = JSON.parse(localStorage.getItem('hkzf_city'))
 
   if (!localCity) {
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       const BMapCity = new window.BMap.LocalCity()
       BMapCity.get(async ({ name }) => {
         try {
