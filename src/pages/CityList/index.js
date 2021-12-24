@@ -1,4 +1,4 @@
-import { Component } from 'react'
+import { Component, createRef } from 'react'
 import { NavBar } from 'antd-mobile'
 import { getCurrentCity } from '../../utils/citydata'
 import { List, AutoSizer } from 'react-virtualized'
@@ -26,14 +26,35 @@ const processCityData = (cityList) => {
 }
 
 class CityList extends Component {
-  state = {
-    cityListData: {},
-    cityIndexList: [],
-    activeIndex: 0
+  constructor (props) {
+    super(props)
+    this.state = {
+      cityListData: {},
+      cityIndexList: [],
+      activeIndex: 0
+    }
+    this.listComponentRef = createRef()
+  }
+
+  getCityList = async (level = 1) => {
+    const { body } = await this.$request('/area/city', 'get', { level })
+    const { cityListData, cityIndexList } = processCityData(body)
+    const { body: hotCityList } = await this.$request('/area/hot')
+
+    cityListData['hot'] = hotCityList
+    cityIndexList.unshift('hot')
+
+    const currentCity = await getCurrentCity()
+    cityListData['#'] = [currentCity]
+    cityIndexList.unshift('#')
+
+    this.setState(() => ({
+      cityListData,
+      cityIndexList
+    }))
   }
 
   rowRenderer = ({ key, index, isScrolling,  isVisible,  style }) => {
-    // this.setState({ activeIndex: index})
     const letter = this.state.cityIndexList[index]
     const format = (letter) => {
       switch (letter) {
@@ -57,47 +78,35 @@ class CityList extends Component {
     )
   }
 
+  onRowsRendered = ({ startIndex }) => {
+    if (this.state.activeIndex !== startIndex) {
+      this.setState(() => ({ activeIndex: startIndex }))
+    }
+  }
+
   rowHeight = ({ index }) => {
     const { cityListData, cityIndexList } = this.state
     return TITLE_HEIGHT + CITY_HEIGHT * cityListData[cityIndexList[index]].length
   }
 
-  getCityList = async (level = 1) => {
-    const { body } = await this.$request('/area/city', 'get', { level })
-    const { cityListData, cityIndexList } = processCityData(body)
-    const { body: hotCityList } = await this.$request('/area/hot')
-
-    cityListData['hot'] = hotCityList
-    cityIndexList.unshift('hot')
-
-    const currentCity = await getCurrentCity()
-    cityListData['#'] = [currentCity]
-    cityIndexList.unshift('#')
-
-    this.setState(() => ({
-      cityListData,
-      cityIndexList
-    }))
-  }
-
   renderRightIndex = () => {
-    const clickHandler = (i) => {
-      console.log(i)
-      this.setState(() => ({ activeIndex: i }))
+    const rightIndexClickHandler = (i) => {
+      this.listComponentRef.current.scrollToRow(i)
     }
     return (
       this.state.cityIndexList.map((v, i) => (
-        <li className={ styles['li'] } key={ v } onClick={ ()=>clickHandler(i) }>
+        <li className={ styles['li'] } key={ v } onClick={ () => rightIndexClickHandler(i) }>
           <span className={ i === this.state.activeIndex ? styles['active'] : '' }>
-            { v==='hot'? '热': v.toUpperCase() }
+            { v === 'hot' ? '热' : v.toUpperCase() }
           </span>
         </li>
       ))
     )
   }
 
-  componentDidMount () {
-    this.getCityList()
+  async componentDidMount () {
+    await this.getCityList()
+    this.listComponentRef.current.measureAllRows()
   }
 
   render () {
@@ -121,6 +130,9 @@ class CityList extends Component {
             rowCount={ this.state.cityIndexList.length }
             rowHeight={ this.rowHeight }
             rowRenderer={ this.rowRenderer }
+            onRowsRendered={ this.onRowsRendered }
+            scrollToAlignment='start'
+            ref={ this.listComponentRef }
           />)
         }
         </AutoSizer> 
@@ -143,6 +155,7 @@ export default CityList
 // 2、格式: {a:[{},..], b:[{label: "北京", pinyin: "beijing", short: "bj", value…},,{},..], ...}
 // 3、渲染右侧城市索引需要的数据 cityIndexList
 // 3、格式： [a', 'b', ...]
+
 // 4、整体思路：
 // 4、1 遍历城市列表，通过每一项的short（城市名简写字母）使用String.substring()获取每一项的城市首字母，该首字母作为cityListData对象的字段名
 // 4、2 将首字母作为对象cityListData的字段名，
@@ -153,6 +166,7 @@ export default CityList
 // 7、cityIndexList.unshift('hot') 表示往数组前面插入一个'hot'字段，作为cityListData['hot']的索引
 // 8、cityIndexList数组与cityListData对象是对应的关系，通过数组索引可以查询到对象中对应的数据
 // 9、react-virtualized适用于可视区加载，通过可视区来加载数据比懒加载性能要高，适用于大量数据的列表或者表格组件，它比懒加载更加高性能的地方是在于它不会操作多余的dom
+
 // 10、react-virtualized的使用流程
 // 10、st1 安装react-virtualized
 // 10、st2 将react-virtualized的样式导入到入口（导入一次，后续不需要在使用组件的地方再次导入）
@@ -165,5 +179,17 @@ export default CityList
 // N4、List组件属性rowCount（行数）取决于遍历数组的长度、rowHeight（每行行高）需要根据内容进行计算，通常不会直接写成数值类型，而是需要定义为函数进行计算
 // N4、List组件属性rowHeight如果值是函数时，其自带一个参数对象，可从参数对象中解构出index用于记录当前行的索引
 // N4、城市列表行高 = 固定的数量1个标题 + 不固定的数量的若干城市名（即 rowheight= 标体高度 + 单个城市高度 * 城市数量 ）
+// N4、List组件属性onRowsRendered的值是一个回调函数，形参对象可以获取List组件渲染行的相关的信息，可以解构出对象中的startIndex（起始索引，List组件可视区最顶部那一行的索引）与右侧字母索引建立联系
+// N4、List组件属性onRowsRendered的回调中可以实现滚动城市列表时让右侧对应的字母高亮
 // N5、AutoSizer是个高阶组件，内部使用到了render-props模式，可以通过解构width与height的方式将获取到的页面容器宽高设置给List组件的整体宽高，让List组件整体宽高与容器做适配
 // N6、因为rowRenderer需要使用到类组件state状态中的数据，因此必须将其从类组件外部移到类组件内部，这样子才能使用类组件state中的数据
+// N7、react-virtualized的List实例化方法（Public Methods）中的各个方法，必须通过List组件实例去调用，因此必须先获取List组件实例（即，上面的listComponentRef）
+// N8、react-virtualized的List实例化方法measureAllRows()在使用时报错：Uncaught Error: Requested index -1 is outside of range 0..0
+// N8、原因是获取List渲染数据的this.getCityList()是异步的，而同步的measureAllRows()先执行时，数据还未拿到，因此报错索引范围不正确
+// N8、解决方法：只需要等this.getCityList()拿到数据后再执行react-virtualized的List组件的实例化方法measureAllRows()即可
+// N9、List组件的实例方法必须通过组件实例点出来，因此必须获取到List组件实例
+// N10、List组件的实例方法scrollToRow(index)用于滚动到指定的行，该方法生效的前提是必须是预览过的行
+// N10、List组件的实例方法measureAllRows()用于提前预览所有List组件的渲染行，会与scrollToRow(index)搭配使用，实现点击右侧字母索引时滚动到List组件对应的行
+// N10、List组件属性scrollToAlignment用于设置滚动行的对齐方式，'start'表示指定List组件中的行出现在可视区的最上方（当点击右侧字母索引时，对应的List行会滚动到可视区最上方）
+
+
