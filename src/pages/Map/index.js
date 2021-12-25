@@ -2,16 +2,27 @@ import { Component } from 'react'
 import styles from './index.module.scss'
 import XxxNavHeader from '../../components/XxxNavHeader'
 
+const BMap = window.BMap
+
 class Map extends Component {
-  componentDidMount () {
-    const map = new window.BMap.Map(styles['map'])
-    const myCity = new window.BMap.LocalCity()
-    myCity.get(({ center, level, name }) => {
-      const point = new window.BMap.Point(center.lng, center.lat)
-      map.centerAndZoom(point, level)
-      map.setCenter(name)
-    })
+  initMap = () => {
+    const { label } = JSON.parse(localStorage.getItem('hkzf_city'))
+    const map = new BMap.Map(styles['map'])
+    const myGeo = new BMap.Geocoder()
+    myGeo.getPoint(label, (point) => {      
+      if (point) {      
+        map.centerAndZoom(point, 11)  
+        map.addOverlay(new BMap.Marker(point))
+        map.addControl(new BMap.NavigationControl())
+        map.addControl(new BMap.ScaleControl())
+      }      
+    }, label)
   }
+
+  componentDidMount () {
+    this.initMap()
+  }
+
   render () {
     return (
       <div className={ styles['map-container'] }>
@@ -26,7 +37,7 @@ class Map extends Component {
 
 export default Map
 
-// 百度地图在react项目的使用流程
+// 百度地图在react项目的使用流程（当前采用的是百度地图JS文档API的v3版本）
 // st1、在百度地图开放平台注册账号并获取AK
 // st2、在项目惟一静态页public/index.html中使用script标签引入百度地图API文件，将自己账号的AK密钥替换到相应位置
 // st3、设置全局样式，以便百度地图能够正常展示
@@ -42,3 +53,12 @@ export default Map
 // N01、当前组件因为使用了css-modules方案解决样式冲突，因此st4会以变量对象的方式（即styles['xxx']的形式）点出css选择器
 // N02、因为使用css-modules解决样式冲突，因此当前组件中st5传入的地图容器id也是styles['map']的形式，即new window.BMap.Map(styles['map'])
 // N03、如果在样式文件中将css选择器改成css-modules的全局模式，即:global(#map)，那么st5传入的地图容器id就是 new window.BMap.Map('map')
+// N04、将百度地图SDK挂载到静态页script标签中的方式使用，相当于是将百度地图对象挂载到window对象中，因此百度地图对象BMap必须通过window对象访问
+// N05、new BMap.Geocoder()是百度地图API，用于将文本地址解析为point坐标点，有了坐标才能进行调用展示地图的API（百度地图API不用记忆，直接参照官网示例复制使用即可）
+// N06、map.centerAndZoom(point, 11)根据坐标点与缩放级别展示地图
+// N06、map.addOverlay(new BMap.Marker(point))在地图特定坐标点展示覆盖物
+// N06、map.addControl(new BMap.NavigationControl())为地图添加平移控件
+// N06、map.addControl(new BMap.ScaleControl())为地图添加比例尺控件
+
+
+
