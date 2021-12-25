@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import styles from './index.module.scss'
+import XxxNavHeader from '../../components/XxxNavHeader'
 
 class Map extends Component {
   componentDidMount () {
@@ -14,6 +15,9 @@ class Map extends Component {
   render () {
     return (
       <div className={ styles['map-container'] }>
+        <div className={ styles['mt'] }>
+          <XxxNavHeader>地图找房</XxxNavHeader>
+        </div>
         <div id={ styles['map'] }></div>
       </div>
     )

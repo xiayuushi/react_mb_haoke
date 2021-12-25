@@ -13,7 +13,7 @@ export const getCurrentCity = () => {
         } catch (err) {
           reject(err)
         }
-      })   
+      })
     })
   }
 

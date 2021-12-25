@@ -4,19 +4,8 @@
   padding-top: 2.25rem;
 
   // 顶部导航栏
-  .navbar {
-    height: 2.25rem;
+  .mt {
     margin-top: -2.25rem;
-
-    background-color: #f6f5f6;
-    :global(.am-navbar-title) {
-      font-size: .9rem;
-      color: #333;
-    }
-    :global(.icon-back) {
-      font-size: .8rem;
-      color: #333;
-    }
   }
 
   // 城市列表
@@ -68,3 +57,4 @@
 // 2、.city-list-container必须 挤出顶部导航栏高度，否则顶部导航栏会随下方内容List组件一起滚动（此时List组件的高度与整体容器高度一致）
 // 2、因此 .city-list-container { height: 100% } 然后让导航栏往上走个负margin-top（值为导航栏高度值），即 .navbar { margin-top: -2.25rem }
 // 3、react-virtualized的List组件渲染的每一行可能高度会随内容多少而不同，因此不要使用flex布局，而是应该使用明确高度的height与line-height来书写样式，便于后期计算List中每一行的高度
+// 4、外层容器的padding-top正值与内层容器的margin-top负值，可以预留出容器内容被遮挡的部分

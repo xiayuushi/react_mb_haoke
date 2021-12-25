@@ -1,8 +1,9 @@
 import { Component, createRef } from 'react'
-import { NavBar, Toast } from 'antd-mobile'
+import { Toast } from 'antd-mobile'
 import { getCurrentCity } from '../../utils/citydata'
 import { List, AutoSizer } from 'react-virtualized'
 import styles from './index.module.scss'
+import XxxNavHeader from '../../components/XxxNavHeader'
 
 const TITLE_HEIGHT = 20 
 const CITY_HEIGHT = 40
@@ -122,12 +123,9 @@ class CityList extends Component {
       <div className={ styles['city-list-container'] }>
 
         {/* 顶部导航栏 */}
-        <NavBar
-          className={ styles['navbar'] }
-          mode="light"
-          icon={<i className="iconfont icon-back" />}
-          onLeftClick={() => this.props.history.go(-1)}
-        >城市选择</NavBar>
+        <div className={ styles['mt'] }>
+          <XxxNavHeader>城市选择</XxxNavHeader>
+        </div>
 
         {/* 内容区 左侧城市列表 */}
         <AutoSizer>
@@ -145,7 +143,7 @@ class CityList extends Component {
         }
         </AutoSizer> 
 
-        {/* 内容区 右侧字母 */}
+        {/* 内容区 右侧字母索引 */}
         <ul className={ styles['ul'] }>
           { this.renderRightIndex() }
         </ul>
@@ -199,5 +197,3 @@ export default CityList
 // N10、List组件的实例方法scrollToRow(index)用于滚动到指定的行，该方法生效的前提是必须是预览过的行
 // N10、List组件的实例方法measureAllRows()用于提前预览所有List组件的渲染行，会与scrollToRow(index)搭配使用，实现点击右侧字母索引时滚动到List组件对应的行
 // N10、List组件属性scrollToAlignment用于设置滚动行的对齐方式，'start'表示指定List组件中的行出现在可视区的最上方（当点击右侧字母索引时，对应的List行会滚动到可视区最上方）
-
-

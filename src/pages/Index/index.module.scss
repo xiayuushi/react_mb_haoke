@@ -147,7 +147,10 @@
 
 // 1、css-modules方案解决样式冲突：
 // A、带':global()'的是通用样式或者组件额外生成的样式，使用时直接写字符串类名即可 className='carouse-wrap'
-// B、不带':global()'的是有作用域的类样式，使用时应该以 css-modules文件导出对象点出类名方式使用 className={ 导出变量名.['home-index-container'] }
+// B、不带':global()'的是有作用域的类样式，使用时应该以 css-modules文件导出对象点出类名方式使用 className={ 导出变量名['home-index-container'] }
 // 2、对于库组件衍生出来的样式，如果是采用css-modules方案，则必须使用:global()对其进行控制，否则无法选取该衍生样式
-// 3、使用左右某一侧的边框来做竖线效果，可以使用 line-height 来控制其显示高度
-// 4、控制元素在垂直方向的对齐方式 vertical-align 值为middle时 表示将元素与父元素中部对齐
+// 3、对于css-modules中:global()控制的全局样式，通常需要将其嵌套到某个容器中以便于权重控制，让该样式在容器中生效
+// 4、对于css-modules中非全局样式，通常不会使用scss嵌套的方式进行样式嵌套书写，因为css-modules的非全局样式本身就是惟一的
+// 5、总之，如果不是权重问题，css-modules控制的非全局样式，一律不要像scss那样嵌套使用（涉及权重不足时，css-modules的非全局样式再嵌套到父系css选择器中也不迟）
+// 6、使用左右某一侧的边框来做竖线效果，可以使用 line-height 来控制其显示高度
+// 7、控制元素在垂直方向的对齐方式 vertical-align 值为middle时 表示将元素与父元素中部对齐

@@ -1,0 +1,18 @@
+// 顶部导航栏
+.navbar {
+  height: 2.25rem;
+  // margin-top: -2.25rem;
+
+  background-color: #f6f5f6;
+  :global(.am-navbar-title) {
+    font-size: .9rem;
+    color: #333;
+  }
+  :global(.icon-back) {
+    font-size: .8rem;
+    color: #333;
+  }
+}
+
+// 1、margin-top负值只是针对需要做全屏展示的某些组件（如Map组件、CityList组件）使用
+// 2、而封装组件的目的是为了通用，因此此处将margin-top负值这类特定组件才需要的样式注释掉（后续在特定组件需要时，自行添加上）

@@ -17,10 +17,12 @@ instance.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 
-export default (url, method = 'get', payload) => {
+const request = (url, method = 'get', payload) => {
   return instance({
     url,
     method,
     [method.toLowerCase() === 'get'? 'params' : 'data']: payload
   })
 }
+
+export default request
