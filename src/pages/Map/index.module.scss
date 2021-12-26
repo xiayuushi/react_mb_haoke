@@ -10,4 +10,23 @@
   }
 }
 
+// 覆盖物内容样式
+.label {
+  position: absolute;
+  display: inline-block;
+  width: 70px;
+  height: 70px;
+  color: #fff;
+  line-height: 1;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 100%;
+  border: 2px solid rgba(255, 255, 255, .8);
+  background-color: rgba(34, 187, 118, .8);
+}
+
+.name {
+  padding: 18px 0 6px 0;
+}
+
 // 1、外层容器的padding-top正值与内层容器的margin-top负值，可以预留出容器内容被遮挡的部分
