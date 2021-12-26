@@ -6,42 +6,51 @@ const BMap = window.BMap
 
 class Map extends Component {
   initMap = () => {
-    const { label } = JSON.parse(localStorage.getItem('hkzf_city'))
+    const { label, value } = JSON.parse(localStorage.getItem('hkzf_city'))
 
     const map = new BMap.Map(styles['map'])
     const myGeo = new BMap.Geocoder()
-    myGeo.getPoint(label, (point) => {      
+    myGeo.getPoint(label, async (point) => {      
       if (point) {
         map.centerAndZoom(point, 11)  
         map.addOverlay(new BMap.Marker(point))
         map.addControl(new BMap.NavigationControl())
         map.addControl(new BMap.ScaleControl())
 
-        const opts = {
-          position: point,
-          offset: new BMap.Size(-35, -35)
-        }
-        const label = new BMap.Label('文本覆盖物', opts)
-        label.setContent(`
-          <div class="${styles['label']}">
-            <p class="${styles['name']}">深圳</p>
-            <p>99套</p>
-          </div>
-        `)
-        const labelStyle = {
-          padding: 0,
-          color: '#fff',
-          fontSize: '12px',
-          cursor: 'pointer',
-          textAlign: 'center',
-          whiteSpace: 'nowrap',
-          border: '0 solid #f00',
-        }
-        label.setStyle(labelStyle)
-        label.addEventListener('click', () => {
-          console.log('当前覆盖物被点击了')
-        }, false)
-        map.addOverlay(label)
+        const { body: areaList } = await this.$request(`/area/map?id=${value}`)
+
+        areaList.forEach(item => {
+          const { coord: { longitude, latitude }, count, label: areaName, value } = item
+
+          const currentAreaPoint = new BMap.Point(longitude, latitude)
+          const opts = {
+            position: currentAreaPoint,
+            offset: new BMap.Size(-35, -35)
+          }
+          const label = new BMap.Label('', opts)
+          label.id = value
+          label.setContent(`
+            <div class="${styles['label']}">
+              <p class="${styles['name']}">${ areaName }</p>
+              <p>${ count }套</p>
+            </div>
+          `)
+          const labelStyle = {
+            padding: 0,
+            color: '#fff',
+            fontSize: '12px',
+            cursor: 'pointer',
+            textAlign: 'center',
+            whiteSpace: 'nowrap',
+            border: '0 solid #f00',
+          }
+          label.setStyle(labelStyle)
+          label.addEventListener('click', () => {
+            map.centerAndZoom(currentAreaPoint, 13)
+            setTimeout(() => map.clearOverlays(), 0)
+          })
+          map.addOverlay(label)
+        })
       }      
     }, label)
   }
@@ -96,3 +105,6 @@ export default Map
 // N7、5 将文本覆盖物对象label添加到地图中：map.addOverlay(label)
 // N7、默认情况下生产的文本覆盖物以定位坐标point的左上角为中心点，而label对象第二参数opts中的offset可以配置偏移量，置为覆盖物宽高的一半，让覆盖物偏移到中心点正中心
 // N7、如果为使用label.setContent()为覆盖物添加了标签，则需要将new BMap.Label()第一参数的文本内容置为空字符串，但不能没有第一参数，因为需要引出第二参数
+
+// N8、点击覆盖物时，会以当前覆盖物为中心放大比例，然后进入子级区域的同时清除掉所有覆盖物
+// N8、调用map.clearOverlays()清除覆盖物时，百度地图会报错，此时必须将该方法放入定时器延迟调用才可以解决该报错
