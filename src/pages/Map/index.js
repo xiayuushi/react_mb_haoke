@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { Toast } from 'antd-mobile'
 import styles from './index.module.scss'
 import XxxNavHeader from '../../components/XxxNavHeader'
 
@@ -27,11 +28,18 @@ class Map extends Component {
   }
 
   renderOverlays = async (id) => {
-    const { overlaysType, nextZoom } = this.getTypeAndZoom()
-    const { body: areaList } = await this.$request(`/area/map?id=${id}`)
-    areaList.forEach(item => {
-      this.createOverlays(item, overlaysType, nextZoom)
-    })
+    try {
+      const { overlaysType, nextZoom } = this.getTypeAndZoom()
+      Toast.loading('加载中...', 0, null, true)
+      const { body: areaList } = await this.$request(`/area/map?id=${id}`)
+      Toast.hide()
+      areaList.forEach(item => {
+        this.createOverlays(item, overlaysType, nextZoom)
+      })
+    } catch (err) {
+      console.log(err)
+      Toast.hide()
+    }
   }
 
   createOverlays = (item, overlaysType, nextZoom) => {
@@ -109,8 +117,15 @@ class Map extends Component {
   }
 
   getHouseList = async (id) => {
-    const { body: { list } } = await this.$request(`/houses?cityId=${id}`)
-    this.setState(() => ({ houseList: list, showHouseList: true }))
+    try {
+      Toast.loading('加载中...', 0, null, true)
+      const { body: { list } } = await this.$request(`/houses?cityId=${id}`)
+      Toast.hide()
+      this.setState(() => ({ houseList: list, showHouseList: true }))
+    } catch (err) {
+      console.log(err)
+      Toast.hide()
+    }
   }
 
   initMap = () => {
