@@ -96,11 +96,18 @@ class Map extends Component {
       whiteSpace: 'nowrap',
       border: '0 solid #f00',
     })
-    label.addEventListener('click', () => {
+    label.addEventListener('click', e => {
       this.getHouseList(id)
+      // 获取当前点击项，移动当前点击的这个（最后一级小区级）地图覆盖物到中间位置
+      const target = e.changedTouches[0]
+      this.map.panBy(
+        window.innerWidth / 2 - target.clientX,
+        (window.innerHeight - 330) / 2 -target.clientY
+      )
     })
     this.map.addOverlay(label)
   }
+
   getHouseList = async (id) => {
     const { body: { list } } = await this.$request(`/houses?cityId=${id}`)
     this.setState(() => ({ houseList: list, showHouseList: true }))
@@ -125,6 +132,12 @@ class Map extends Component {
         this.renderOverlays(value)
       }      
     }, label)
+
+    this.map.addEventListener('movestart', () => {
+      if (this.state.showHouseList) {
+        this.setState(() => ({ showHouseList: false }))
+      }
+    })
   }
 
   renderHouseList = () => {
@@ -174,7 +187,7 @@ class Map extends Component {
             <h1>房屋列表</h1>
             <Link to="/home/list">更多房源</Link>
           </div>
-          <ul className= { styles['bottom'] }>{ this.renderHouseList() }</ul>
+          <ul className={ styles['bottom'] }>{ this.renderHouseList() }</ul>
         </div>
       </div>
     )
@@ -219,6 +232,7 @@ export default Map
 // N8、点击覆盖物时，会以当前覆盖物为中心放大比例，然后进入子级区域的同时清除掉所有覆盖物
 // N8、调用map.clearOverlays()清除覆盖物时，百度地图会报错，此时必须将该方法放入定时器延迟调用才可以解决该报错
 // N9、const { coord: { longitude } } = item是ES6对象的解构语法，此处相当于二次解构，即 const logitude = item.coord.logitude
+// N10、map.getZoom()是百度地图API用于获取地图缩放级别
 
 // 1、点击当前区级覆盖物，会以当前覆盖物为中心点放大缩放比例进入下一子级（镇级）覆盖物，子级覆盖物也是如此，直到进入到最后一级小区覆盖物
 // 2、区级与镇级覆盖物都是圆形的，而最后一级覆盖物是方形的
@@ -234,7 +248,10 @@ export default Map
 // 3、3 区或镇则调用createCircleOverlays()创建圆形覆盖物
 // 3、3 最后一级小区则调用createRectOverlays()创建方形覆盖物
 
-
 // 3、4 createCircleOverlays()用于创建圆形覆盖物，根据数据创建覆盖物，绑定事件（以当前坐标为中心放大比例，清除之前上一级别的覆盖物，渲染下一级别数据）
-// 3、5 createRectOverlays()用于创建方形覆盖物，即最后一级覆盖物，绑定事件（以当前坐标为中心移动地图，渲染房源列表数据）
-// 4、map.getZoom()是百度地图API用于获取地图缩放级别
+// 3、5 createRectOverlays()用于创建方形覆盖物，即最后一级覆盖物，绑定事件（点击当前覆盖物并将它移动到地图中间，渲染房源列表数据）
+// 3、5 createRectOverlays()内点击事件监听中通过事件对象e获取当前点击的覆盖物，调用地图实例的panBy(水平位移,垂直位移)将其移动到地图中间位置
+// 3、5 map.panBy(水平位移像素,垂直位移像素)
+// 3、5 水平位移像素 = (window.innerWidth窗口可视区宽度含滚动条 / 2) - e.changedTouches[0].clientX点击项水平可视区宽度
+// 3、5 垂直位移像素 = (window.innerHeight窗口可视区高度含滚动条 -下方房源盒子高度) / 2 - e.changedTouches[0].clientY点击项垂直可视区高度
+// 3、6 map.addEventListener('movestart', () => {}) 为地图添加移动监听，当开始移动时，让下方的房源列表消失
