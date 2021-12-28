@@ -1,21 +1,27 @@
 import { Component } from 'react'
+import { Link } from 'react-router-dom'
 import styles from './index.module.scss'
 import XxxNavHeader from '../../components/XxxNavHeader'
 
 const BMap = window.BMap
 
 class Map extends Component {
+  state = {
+    houseList: [],
+    showHouseList: false
+  }
+
   getTypeAndZoom = () => {
     const zoom = this.map.getZoom()
     let overlaysType, nextZoom
     if (zoom >= 10 && zoom < 12) {
       overlaysType = 'circle'
-      nextZoom = 13 // zoom=11（默认值11）是区，下一缩放级别13
+      nextZoom = 13 
     } else if (zoom >= 12 && zoom < 14) {
       overlaysType = 'circle'
-      nextZoom = 15 // zoom=13是镇，下一缩放级别15
+      nextZoom = 15 
     } else if (zoom >= 14 && zoom < 16) {
-      overlaysType = 'rect' // zoom=15是小区，没有下一级缩放级别
+      overlaysType = 'rect' 
     }
     return { overlaysType, nextZoom }
   }
@@ -29,10 +35,9 @@ class Map extends Component {
   }
 
   createOverlays = (item, overlaysType, nextZoom) => {
-    // item是区或镇或小区的房源数据、type是覆盖物类型、nextZoom是下一级缩放级别
+    // item是区或镇或小区的房源数据、overlaysType是覆盖物类型、nextZoom是下一级缩放级别
     const { coord: { longitude, latitude }, count, label: areaName, value: id } = item
     const point = new BMap.Point(longitude, latitude)
-
     overlaysType === 'circle'
     ? this.createCircleOverlays(point, areaName, count, id, nextZoom)
     : this.createRectOverlays(point, areaName, count, id)
@@ -44,14 +49,12 @@ class Map extends Component {
       offset: new BMap.Size(-35, -35) }
     )
     label.id = id
-
     label.setContent(`
       <div class="${styles['circle']}">
         <p class="${styles['name']}">${ areaName }</p>
         <p>${ count }套</p>
       </div>
     `)
-
     label.setStyle({
       padding: 0,
       color: '#fff',
@@ -65,29 +68,25 @@ class Map extends Component {
     label.addEventListener('click', () => {
       this.renderOverlays(id)
       this.map.centerAndZoom(point, nextZoom)
-      setTimeout(() => {
-        this.map.clearOverlays()
-        // 之所以此处使用定时器，是为了解决直接修改导致百度地图API报错的问题
-      }, 0)
+      setTimeout(() => (this.map.clearOverlays()), 0) 
+      // 之所以此处将清除覆盖物的方法加入定时器中，是为了解决直接修改引发的dom操作导致百度地图API报错的问题
     })
     this.map.addOverlay(label)
   }
 
   createRectOverlays = (point, areaName, count, id) => {
-    const label = new BMap.Label('', { 
+    const label = new BMap.Label('', {
       position: point, 
       offset: new BMap.Size(-50, -28) }
     )
     label.id = id
-
     label.setContent(`
       <div class="${styles['rect']}">
         <span class="${styles['housename']}">${ areaName }</span>
         <span class="${styles['housecount']}">${ count }套</span>
-        <i class="${styles['arrow']}">${ count }套</i>
+        <i class="${styles['arrow']}"></i>
       </div>
     `)
-
     label.setStyle({
       padding: 0,
       color: '#fff',
@@ -97,11 +96,14 @@ class Map extends Component {
       whiteSpace: 'nowrap',
       border: '0 solid #f00',
     })
-
     label.addEventListener('click', () => {
-      console.log('小区被点击了')
+      this.getHouseList(id)
     })
     this.map.addOverlay(label)
+  }
+  getHouseList = async (id) => {
+    const { body: { list } } = await this.$request(`/houses?cityId=${id}`)
+    this.setState(() => ({ houseList: list, showHouseList: true }))
   }
 
   initMap = () => {
@@ -110,7 +112,7 @@ class Map extends Component {
     const map = new BMap.Map(styles['map'])
     this.map = map 
     // 将当前方法中的map对象挂载到this中，让组件实例中的其他方法也能够通过this.map使用
-    // 之所以不将上面的new BMap赋值直接改成this.map，是不想大动干戈将当前函数中的map改成this.map
+    // 之所以不将上面的new BMap赋值直接改成this.map，是不想大动干戈将当前函数中的map依次改成this.map
 
     const myGeo = new BMap.Geocoder()
     myGeo.getPoint(label, async (point) => {      
@@ -125,6 +127,31 @@ class Map extends Component {
     }, label)
   }
 
+  renderHouseList = () => {
+    return (
+      this.state.houseList.map(item => (
+        <li className={ styles['item'] } key={ item.houseCode }>
+          <img src={ process.env.REACT_APP_URL + item.houseImg } alt="" />
+          <div className={ styles['content'] }>
+          <h1 className={ styles['title'] }>{ item.title }</h1>
+          <div className={ styles['desc'] }>{ item.desc }</div>
+            <div className={ styles['tags'] }>
+             {
+               item.tags.map((v, i) => {
+                const className = 'tag' + (i + 1)
+                return (
+                  <span className={ styles[className] } key={ v }>{ v }</span>
+                )
+               })
+             }
+            </div>
+            <div className={ styles['price'] }>{ item.price }<span>元/月</span></div>
+          </div>
+        </li>
+      ))
+    )
+  }
+
   componentDidMount () {
     this.initMap()
   }
@@ -132,10 +159,23 @@ class Map extends Component {
   render () {
     return (
       <div className={ styles['map-container'] }>
+
+        {/* 顶部导航栏 */}
         <div className={ styles['mt'] }>
           <XxxNavHeader>地图找房</XxxNavHeader>
         </div>
+
+        {/* 地图 */}
         <div id={ styles['map'] }></div>
+
+        {/* 房源列表 */}
+        <div className={ [styles['houselist'], this.state.showHouseList === true ? styles['show'] : ''].join(' ') }>
+          <div className={ styles['top'] }>
+            <h1>房屋列表</h1>
+            <Link to="/home/list">更多房源</Link>
+          </div>
+          <ul className= { styles['bottom'] }>{ this.renderHouseList() }</ul>
+        </div>
       </div>
     )
   }
@@ -183,10 +223,18 @@ export default Map
 // 1、点击当前区级覆盖物，会以当前覆盖物为中心点放大缩放比例进入下一子级（镇级）覆盖物，子级覆盖物也是如此，直到进入到最后一级小区覆盖物
 // 2、区级与镇级覆盖物都是圆形的，而最后一级覆盖物是方形的
 // 3、以上会出现大量逻辑重复，因此可以封装进行代码简化
-// 4、renderOverlays()传入区域id，获取区域房源数据
-// 4、getTypeAndZoom()用于判断覆盖物类型以及下一级的地图缩放比例，该方法会在renderOverlays()内部调用，
-// 4、getTypeAndZoom()中的type是覆盖物类型，nextZoom是下一级的缩放级别，其中zoom当前的缩放级别，初始11是默认缩放级别，展示所有区的覆盖物
-// 4、createOverlays()根据传入的类型，调用相应的方法创建对应的覆盖物（区或镇则调用createCircleOverlays()创建圆形覆盖物、最后一级小区则调用createRectOverlays()创建方形覆盖物）
-// 4、createCircleOverlays()用于创建圆形覆盖物，根据数据创建覆盖物，绑定事件（以当前坐标为中心放大比例，清除之前上一级别的覆盖物，渲染下一级别数据）
-// 4、createRectOverlays()用于创建方形覆盖物，即最后一级覆盖物，绑定事件（以当前坐标为中心，移动地图，渲染房源列表数据）
+// 3、1 getTypeAndZoom()根据当前地图缩放级别决定下一子级区域的缩放级别与覆盖物类型，该方法会在renderOverlays()内部调用
+// 3、1 if (zoom >= 10 && zoom < 12) 当前zoom=11（默认值11）是区，会展示所有区的覆盖物，下一缩放级别nextZoom=13
+// 3、1 if (zoom >= 12 && zoom < 14) 当前zoom=13是镇，下一缩放级别nextZoom=15
+// 3、1 if (zoom >= 14 && zoom < 16) 当前zoom=15是小区，没有下一级缩放级别nextZoom 
+
+// 3、2 renderOverlays()渲染覆盖物，会根据传入的区域、镇或者小区的id生成对应的覆盖物
+
+// 3、3 createOverlays()根据传入的类型，调用相应的方法创建对应的覆盖物，因为逻辑比较多抽离为两个方法
+// 3、3 区或镇则调用createCircleOverlays()创建圆形覆盖物
+// 3、3 最后一级小区则调用createRectOverlays()创建方形覆盖物
+
+
+// 3、4 createCircleOverlays()用于创建圆形覆盖物，根据数据创建覆盖物，绑定事件（以当前坐标为中心放大比例，清除之前上一级别的覆盖物，渲染下一级别数据）
+// 3、5 createRectOverlays()用于创建方形覆盖物，即最后一级覆盖物，绑定事件（以当前坐标为中心移动地图，渲染房源列表数据）
 // 4、map.getZoom()是百度地图API用于获取地图缩放级别

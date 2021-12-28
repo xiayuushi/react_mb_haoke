@@ -23,4 +23,8 @@ i {
   font-style: normal;
 }
 
+a {
+  text-decoration: none;
+}
+
 // 1、touch-action: pan-y;用于清除轮播图组件中chrome的阻止默认事件时的报错
