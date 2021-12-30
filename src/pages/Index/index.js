@@ -7,6 +7,7 @@ import navImg1 from '../../assets/navs/nav-1.png'
 import navImg2 from '../../assets/navs/nav-2.png'
 import navImg3 from '../../assets/navs/nav-3.png'
 import navImg4 from '../../assets/navs/nav-4.png'
+import XxxSearchHeader from '../../components/XxxSearchHeader'
 
 const navDataList = [
   { id: 1, img: navImg1, title: '整租', path: '/home/list' },
@@ -111,19 +112,7 @@ class Index extends Component {
             : ''
           }
         {/* 顶部导航 */}
-          <Flex className={ styles['search-wrap'] }>
-            <Flex className={ styles['search'] }>
-              <div className={ styles['location'] } onClick={ () => this.props.history.push('/citylist') }>
-                <span>{ this.state.currentCityName }</span>
-                <i className="iconfont icon-arrow" />
-              </div>
-              <div className={ styles['form'] } onClick={ () => this.props.history.push('/search') }>
-                <i className="iconfont icon-seach" />
-                <span>请输入小区或地址</span>
-              </div>
-            </Flex>
-            <i className={ [styles['map'], "iconfont icon-map"].join(' ') } onClick={ () => this.props.history.push('/map') } />
-          </Flex>
+          <XxxSearchHeader currentCityName={ this.state.currentCityName } />
         </div>
 
         {/* 菜单导航 */}
