@@ -1,0 +1,51 @@
+// 顶部导航
+.search-wrap {
+  position: absolute;
+  top: 1rem;
+  left: 0;
+  width: 100%;
+  padding: 0 .5rem;
+
+  .search {
+    flex: 1;
+    height: 1.7rem;
+    line-height: .8rem;
+    background-color: #fff;
+    border-radius: .3rem;
+
+    .location {
+      padding: 0 .5rem;
+
+      >i {
+        margin-left: .1rem;
+        font-size: .6rem;
+        color: #7f7f80;
+      }
+    }
+
+    .form {
+      border-left: 1px solid #9c9fa1;
+      ;
+
+      >i {
+        font-size: .7rem;
+        vertical-align: middle;
+        padding: 0 .3rem 0 .6rem;
+        color: #9c9fa1;
+      }
+
+      >span {
+        font-size: .7rem;
+        color: #9c9fa1;
+        vertical-align: middle;
+      }
+    }
+  }
+
+  .map {
+    font-size: 1.2rem;
+    color: #fff;
+    margin-left: .5rem;
+  }
+
+}

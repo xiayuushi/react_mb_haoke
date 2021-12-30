@@ -1,0 +1,26 @@
+.house-list-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.top-search {
+  height: 2.25rem;
+  padding: 0 .5rem;
+  background-color: #f5f6f5;
+  :global(.icon-back) {
+    font-size: .8rem;
+    color: #999999;
+  }
+}
+
+// 调整自定义顶部导航栏组件的样式
+.xxx-search-header {
+  position: relative;
+  top: 0;
+  left: 0;
+  height: 1.5rem;
+  :global(.icon-map) {
+    color: #00ae66;
+  }
+}
