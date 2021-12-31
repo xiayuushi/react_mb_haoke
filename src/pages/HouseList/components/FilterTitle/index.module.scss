@@ -1,0 +1,25 @@
+.filter-title {
+  height: 2rem;
+  text-align: center;
+  background-color: #fff;
+  border-bottom: 0.05rem solid #e4e6f0;
+}
+
+.dropdown {
+  display: inline-block;
+  font-size: .85rem;
+  background-color: #fff;
+  :global(.icon-arrow) {
+    margin-left: .15rem;
+    color: #bbb;
+    font-size: .6rem;
+  }
+}
+
+.selected {
+  color: #21b97a;
+  :global(.icon-arrow) {
+    color: #21b97a;
+  }
+}
+

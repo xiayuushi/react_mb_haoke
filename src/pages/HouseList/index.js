@@ -2,6 +2,7 @@ import { Component } from 'react'
 import { Flex } from 'antd-mobile'
 import XxxSearchHeader from '../../components/XxxSearchHeader'
 import styles from './index.module.scss'
+import Filter from './components/Filter'
 
 const { label } = JSON.parse(localStorage.getItem('hkzf_city'))
 
@@ -9,10 +10,15 @@ class HouseList extends Component {
   render () {
     return (
       <div className={ styles['house-list-container'] }>
+
+        {/* 顶部搜索栏 */}
         <Flex className={ styles['top-search'] }>
           <i className="iconfont icon-back" onClick={ () => this.props.history.go(-1) } />
           <XxxSearchHeader currentCityName={ label } className={ styles['xxx-search-header'] } />
         </Flex>
+
+        {/* 条件筛选栏 */}
+        <Filter />
       </div>
     )
   }
