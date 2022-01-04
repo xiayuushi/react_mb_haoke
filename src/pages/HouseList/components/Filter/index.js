@@ -14,8 +14,10 @@ const titleSelectedStatus = {
 class Filter extends Component {
   state = {
     titleSelectedStatus,
-    openType: ''
+    openType: '',
+    filtersData: {}
   }
+
   onTitleClick = (clickItem) => {
     this.setState((state) => {
       return {
@@ -27,16 +29,62 @@ class Filter extends Component {
       }
     })
   }
+
   onCancel = () => {
     this.setState({
       openType: ''
     })
   }
+
   onSure = () => {
     this.setState({
       openType: ''
     })
   }
+
+  getFiltersData = async () => {
+    const { value } = JSON.parse(localStorage.getItem('hkzf_city'))
+    const { body } = await this.$request(`/houses/condition?id=${value}`)
+    console.log(body)
+    this.setState(() => {
+      return {
+        filtersData: body
+      }
+    })
+  }
+
+  renderFilterPicker = () => {
+    const { openType, filtersData: { area, subway, rentType, price } } = this.state
+    if (openType !== 'area' && openType !== 'mode' && openType !== 'price') {
+      return null
+    }
+    let data = []
+    let cols = 3
+    switch (openType) {
+      case 'area': 
+        data = [area, subway]
+        cols = 3
+        break
+      case 'mode':
+        data = rentType
+        cols = 1
+        break
+      case 'price':
+        data = price
+        cols = 1
+        break
+      default: 
+        break
+    }
+    return (
+      <FilterPicker onCancel={ this.onCancel } onSure={ this.onSure } data={ data } cols={ cols } />
+    )
+  }
+
+  componentDidMount () {
+    this.getFiltersData()
+  }
+
   render () {
     return (
       <div className={ styles['filter-container'] }>
@@ -54,9 +102,7 @@ class Filter extends Component {
 
           {/* 标题栏内容 - 前三个筛选 */}
           {
-            this.state.openType === 'area' || this.state.openType === 'mode' || this.state.openType === 'price'
-            ? <FilterPicker onCancel={ this.onCancel } onSure={ this.onSure } />
-            : null
+            this.renderFilterPicker()
           }
           
           {/* 标题栏内容 - 后一个选项 */}
@@ -84,3 +130,6 @@ export default Filter
 // 5、openType控制filterTitle对应的内容filterPicker组件与filterMore组件的展示与隐藏
 // -、openType的值与标体栏filterTitle组件的选项对应，当选项值为area、mode、price时对应展示区域、方式、租金的内容，该内容都是下拉选项的形式存在的，即filterPicker组件
 // -、openType的值为more时对应展示筛选的内容，该内容是与之前不同的形式存在的，即filterMore组件
+// 6、renderFilterPicker()用于渲染FilterPicker组件的内容数据，因此整合了渲染FilterPicker所需的各种数据
+// -、FilterPicker组件中使用到了antd-mobile的PickerView组件，该组件的data属性就是设置数据源的地方，即renderFilterPicker()中整合的data就是为了给PickerView的data属性使用的
+// -、pickerView组件中如果出现内容"偏左"无法居中的情况，说明该组件的cols属性列数设置不合理（antd-mobile默认设置cols值是3），应该根据不同的内容展示合适的列数才能正常"居中"显示
