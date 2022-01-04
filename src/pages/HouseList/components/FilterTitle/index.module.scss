@@ -1,8 +1,10 @@
 .filter-title {
+  position: relative;
   height: 2rem;
   text-align: center;
   background-color: #fff;
   border-bottom: 0.05rem solid #e4e6f0;
+  z-index: 2;
 }
 
 .dropdown {

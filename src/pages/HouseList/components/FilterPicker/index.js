@@ -96,7 +96,7 @@ class FilterPicker extends Component {
         <PickerView value={this.state.value} data={province} />
 
         {/* 底部按钮 */}
-        <XxxFilterFooter />
+        <XxxFilterFooter onCancel={ this.props.onCancel } onSure={ this.props.onSure } />
       </>
     )
   }

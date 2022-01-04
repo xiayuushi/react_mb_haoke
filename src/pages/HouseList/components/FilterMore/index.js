@@ -13,7 +13,7 @@ class FilterMore extends Component {
     return (
       <div className={ styles['filter-more-container'] }>
         {/* 遮罩层 */}
-        <div className={ styles['mask'] }></div>
+        <div className={ styles['mask'] } onClick={ this.props.onCancel }></div>
 
         {/* 条件内容 */}
         <div className={ styles['content'] }>
@@ -33,7 +33,7 @@ class FilterMore extends Component {
         </div>
 
         {/* 底部按钮 */}
-        <XxxFilterFooter className={ styles['footer'] } />
+        <XxxFilterFooter className={ styles['footer'] } onCancel={ this.props.onCancel } onSure={ this.props.onSure } />
       </div>
     )
   }
