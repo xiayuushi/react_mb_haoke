@@ -8,14 +8,15 @@ const titleList = [
   { title: '筛选', type: 'more' }
 ]
 
-const FilterTitle = () => {
+const FilterTitle = ({ titleSelectedStatus, filterTitleClick }) => {
   return (
     <Flex className={ styles['filter-title'] } align="center">
       {
         titleList.map(item => {
+          const isSelected = titleSelectedStatus[item.type]
           return (
-            <Flex.Item key={ item.type }>
-              <div className={ [styles['dropdown'], styles['selected']].join(' ') }>
+            <Flex.Item key={ item.type } onClick={ () => filterTitleClick(item.type) }>
+              <div className={ [styles['dropdown'], isSelected ? styles['selected'] : ''].join(' ') }>
                 <span>{ item.title }</span>
                 <i className="iconfont icon-arrow" />
               </div>
