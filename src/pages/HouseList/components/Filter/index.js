@@ -27,14 +27,31 @@ class Filter extends Component {
   }
 
   onTitleClick = (clickItem) => {
-    this.setState((state) => {
-      return {
-        titleSelectedStatus: {
-          ...state.titleSelectedStatus,
-          [clickItem]: true
-        },
-        openType: clickItem
+    const { titleSelectedStatus, selectedVals } = this.state
+    const newTitleSelectedStatus = { ...titleSelectedStatus }
+    Object.keys(titleSelectedStatus).forEach(item => {
+      // 当前点击项高亮
+      if (item === clickItem) {
+        newTitleSelectedStatus[clickItem] = true
+        return
       }
+      // 非点击项则根据pickerView是否有选择到值再进行高亮
+      const currentValList = selectedVals[item]
+      if (item === 'area' && (currentValList[0] !=='area' || currentValList.length !== 2)) {
+        newTitleSelectedStatus[item] = true
+      } else if (item === 'mode' && currentValList[0] !== null) {
+        newTitleSelectedStatus[item] = true
+      } else if (item === 'price' && currentValList[0] !== null) {
+        newTitleSelectedStatus[item] = true
+      } else if (item === 'more') {
+        console.log('more')
+      } else {
+        newTitleSelectedStatus[item] = false
+      }
+    })
+    this.setState({
+      openType: clickItem,
+      titleSelectedStatus: newTitleSelectedStatus
     })
   }
 
