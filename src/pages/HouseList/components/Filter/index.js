@@ -120,6 +120,17 @@ class Filter extends Component {
     )
   }
 
+  renderFilterMore = () => {
+    const { openType, filtersData: { characteristic, floor, oriented, roomType } } = this.state
+    const data = { characteristic, floor, oriented, roomType }
+    if (openType !== 'more') {
+      return null
+    }
+    return (
+      <FilterMore onCancel={ this.onCancel } onSure={ this.onSure } data={ data } />
+    )
+  }
+
   componentDidMount () {
     this.getFiltersData()
   }
@@ -146,9 +157,7 @@ class Filter extends Component {
           
           {/* 标题栏内容 - 后一个选项 */}
           {
-            this.state.openType === 'more'
-            ? <FilterMore onCancel={ this.onCancel } onSure={ this.onSure } />
-            : null
+            this.renderFilterMore()
           }
         </div>
       </div>
