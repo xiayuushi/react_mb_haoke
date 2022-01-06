@@ -19,7 +19,7 @@ class FilterPicker extends Component {
 
         {/* 底部按钮 */}
         <XxxFilterFooter
-          onCancel={ this.props.onCancel }
+          onCancel={ () => this.props.onCancel(this.props.type) }
           onSure={ () => this.props.onSure(this.props.type, this.state.value) } 
         />
       </>

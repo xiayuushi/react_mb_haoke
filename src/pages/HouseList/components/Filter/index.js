@@ -12,9 +12,9 @@ const titleSelectedStatus = {
 }
 
 const selectedVals = {
-  area: ['area', null],
-  mode: [null],
-  price: [null],
+  area: ['area', 'null'],
+  mode: ['null'],
+  price: ['null'],
   more: []
 }
 
@@ -39,12 +39,12 @@ class Filter extends Component {
       const currentValList = selectedVals[item]
       if (item === 'area' && (currentValList[0] !=='area' || currentValList.length !== 2)) {
         newTitleSelectedStatus[item] = true
-      } else if (item === 'mode' && currentValList[0] !== null) {
+      } else if (item === 'mode' && currentValList[0] !== 'null') {
         newTitleSelectedStatus[item] = true
-      } else if (item === 'price' && currentValList[0] !== null) {
+      } else if (item === 'price' && currentValList[0] !== 'null') {
         newTitleSelectedStatus[item] = true
-      } else if (item === 'more') {
-        console.log('more')
+      } else if (item === 'more' && currentValList.length !== 0) {
+        newTitleSelectedStatus[item] = true
       } else {
         newTitleSelectedStatus[item] = false
       }
@@ -55,20 +55,50 @@ class Filter extends Component {
     })
   }
 
-  onCancel = () => {
+  onCancel = (openType) => {
+    const { titleSelectedStatus, selectedVals } = this.state
+    const newTitleSelectedStatus = { ...titleSelectedStatus }
+    const currentValList = selectedVals[openType]
+    if (openType === 'area' && (currentValList[0] !== 'area' || currentValList.length !== 2)) {
+      newTitleSelectedStatus[openType] = true
+    } else if (openType === 'mode' && currentValList[0] !== 'null') {
+      newTitleSelectedStatus[openType] = true
+    } else if (openType === 'price' && currentValList[0] !== 'null') {
+      newTitleSelectedStatus[openType] = true
+    } else if (openType === 'more' && currentValList.length !== 0) {
+      newTitleSelectedStatus[openType] = true
+    } else {
+      newTitleSelectedStatus[openType] = false
+    }
     this.setState({
-      openType: ''
+      openType: '',
+      titleSelectedStatus: newTitleSelectedStatus
     })
   }
 
   onSure = (openType, value) => {
     console.log(openType, value)
+    const { titleSelectedStatus } = this.state
+    const newTitleSelectedStatus = { ...titleSelectedStatus }
+    const currentValList = value
+    if (openType === 'area' && (currentValList[0] !== 'area' || currentValList.length !== 2)) {
+      newTitleSelectedStatus[openType] = true
+    } else if (openType === 'mode' && currentValList[0] !== 'null') {
+      newTitleSelectedStatus[openType] = true
+    } else if (openType === 'price' && currentValList[0] !== 'null') {
+      newTitleSelectedStatus[openType] = true
+    } else if (openType === 'more' && currentValList.length !== 0) {
+      newTitleSelectedStatus[openType] = true
+    } else {
+      newTitleSelectedStatus[openType] = false
+    }
     this.setState((state) => ({
         openType: '',
         selectedVals: {
           ...state.selectedVals,
           [openType]: value
-        }
+        },
+        titleSelectedStatus: newTitleSelectedStatus
       })
     )
   }
@@ -203,4 +233,9 @@ export default Filter
 // -、st3 在FilterMore 组件中，将获取到的选中值，设置为子组件状态 selectedValues 的默认值。
 // -、st4 给遮罩层绑定单击事件。
 // -、st5 在单击事件中，调用父组件的方法 onCancel 关闭 FilterMore 组件。
-
+// 11、在打开pickerView或FilterMore面板时，无论是关闭（点击遮罩层关闭或者取消按钮关闭）或者打开（点击确定按钮打开）都应该进行标题高亮判断
+// -、st1 在 Filter 组件的 onTitleClick 方法中，添加 type 为 more 的判断条件。
+// -、st2 当选中值数组长度不为 0 时，表示 FilterMore 组件中有选中项，此时，设置选中状态高亮。
+// -、st3 在点击确定按钮时，根据参数 type 和 value，判断当前菜单是否高亮。
+// -、st4 在关闭对话框时（onCancel），根据 type 和当前type的选中值，判断当前菜单是否高亮。
+// -、注意：因为 onCancel 方法中，没有 openType 参数，所以，就需要在调用 onCancel 方式时，来传递 openType 参数。

@@ -40,11 +40,11 @@ class FilterMore extends Component {
   }
 
   render () {
-    const { data: { characteristic, floor, oriented, roomType }, onCancel } = this.props
+    const { data: { characteristic, floor, oriented, roomType }, onCancel, type } = this.props
     return (
       <div className={ styles['filter-more-container'] }>
         {/* 遮罩层 */}
-        <div className={ styles['mask'] } onClick={ onCancel }></div>
+        <div className={ styles['mask'] } onClick={ () => onCancel(type) }></div>
 
         {/* 条件内容 */}
         <div className={ styles['content'] }>
