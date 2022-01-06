@@ -34,3 +34,5 @@ export default FilterPicker
 // 3、PickerView组件提供onChange事件，事件回调形参就是pickerView组件选择的值
 // 4、因为前三个筛选值都是同一个pickerView组件控制，因此也应该将筛选数据（选中项的值集合）进行状态提升，放到它们的公共父组件中去定义
 // 5、this.props.xxx 其中xxx是组件中定义的属性或者方法，组件内部使用必须通过this.props点出
+// -、组件必须通过定义xxx这个props属性传出
+// -、组件内部才能使用this.props.xxx接收并使用

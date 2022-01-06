@@ -62,6 +62,7 @@ class Filter extends Component {
   }
 
   onSure = (openType, value) => {
+    console.log(openType, value)
     this.setState((state) => ({
         openType: '',
         selectedVals: {
@@ -121,13 +122,20 @@ class Filter extends Component {
   }
 
   renderFilterMore = () => {
-    const { openType, filtersData: { characteristic, floor, oriented, roomType } } = this.state
+    const { openType, selectedVals, filtersData: { characteristic, floor, oriented, roomType } } = this.state
     const data = { characteristic, floor, oriented, roomType }
+    const defaultSelectedValsList = selectedVals.more
     if (openType !== 'more') {
       return null
     }
     return (
-      <FilterMore onCancel={ this.onCancel } onSure={ this.onSure } data={ data } />
+      <FilterMore 
+        onSure={ this.onSure }
+        onCancel={ this.onCancel }
+        data={ data }
+        type={ openType }
+        defaultSelectedValsList={ defaultSelectedValsList }
+      />
     )
   }
 
@@ -182,10 +190,17 @@ export default Filter
 // -、FilterPicker组件中使用到了antd-mobile的PickerView组件，该组件的data属性就是设置数据源的地方，即renderFilterPicker()中整合的data就是为了给PickerView的data属性使用的
 // -、pickerView组件中如果出现内容"偏左"无法居中的情况，说明该组件的cols属性列数设置不合理（antd-mobile默认设置cols值是3），应该根据不同的内容展示合适的列数才能正常"居中"显示
 // 7、Filter组件中必须定义type与currentTypeSelectedVal，将当前pickerView选择的通过props传递给FilterPicker组件内部，以便其内部使用该属性设置选中项的默认值
-// 8、设置默认选中值流程：
-// -、在 Filter 组件中，提供选中值状态：selectedVals
-// -、根据 openType 获取到当前类型的选中值（currentTypeSelectedVal），通过 props 传递给 FilterPicker 组件。
-// -、在 FilterPicker 组件中，将 currentTypeSelectedVal 设置为状态 value 的默认值。
-// -、在点击确定按钮后，在父组件中更新当前 type 对应的 selectedVals 状态值。
+// 8、FilterPicker组件设置默认选中值流程：
+// -、st1 在 Filter 组件中，提供选中值状态：selectedVals
+// -、st2 根据 openType 获取到当前类型的选中值（currentTypeSelectedVal），通过 props 传递给 FilterPicker 组件。
+// -、st3 在 FilterPicker 组件中，将 currentTypeSelectedVal 设置为状态 value 的默认值。
+// -、st4 在点击确定按钮后，在父组件中更新当前 type 对应的 selectedVals 状态值。
 // 9、给FilterPicker添加key属性是为了解决在不销毁FilterPicker组件时pickerView选中的数据无法重新初始化同步更新的问题
 // -、因为state状态属于constructor周期，该周期只会执行一次，如果在组件不销毁的情况下切换pickerView，那么数据不会再次初始化跟随切换更新
+// 10、FilterMore组件设置默认选中值：
+// -、st1 在渲染 FilterMore 组件时，从 selectedValues 中，获取到当前选中值 more。
+// -、st2 通过props 将选中值传递给 FilterMore 组件。
+// -、st3 在FilterMore 组件中，将获取到的选中值，设置为子组件状态 selectedValues 的默认值。
+// -、st4 给遮罩层绑定单击事件。
+// -、st5 在单击事件中，调用父组件的方法 onCancel 关闭 FilterMore 组件。
+
