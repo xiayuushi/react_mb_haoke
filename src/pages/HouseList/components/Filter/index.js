@@ -11,11 +11,19 @@ const titleSelectedStatus = {
   more: false
 }
 
+const selectedVals = {
+  area: ['area', null],
+  mode: [null],
+  price: [null],
+  more: []
+}
+
 class Filter extends Component {
   state = {
     titleSelectedStatus,
     openType: '',
-    filtersData: {}
+    filtersData: {},
+    selectedVals
   }
 
   onTitleClick = (clickItem) => {
@@ -36,10 +44,15 @@ class Filter extends Component {
     })
   }
 
-  onSure = () => {
-    this.setState({
-      openType: ''
-    })
+  onSure = (openType, value) => {
+    this.setState((state) => ({
+        openType: '',
+        selectedVals: {
+          ...state.selectedVals,
+          [openType]: value
+        }
+      })
+    )
   }
 
   getFiltersData = async () => {
@@ -54,12 +67,13 @@ class Filter extends Component {
   }
 
   renderFilterPicker = () => {
-    const { openType, filtersData: { area, subway, rentType, price } } = this.state
+    const { openType, selectedVals, filtersData: { area, subway, rentType, price } } = this.state
     if (openType !== 'area' && openType !== 'mode' && openType !== 'price') {
       return null
     }
     let data = []
     let cols = 3
+    let currentTypeSelectedVal = selectedVals[openType]
     switch (openType) {
       case 'area': 
         data = [area, subway]
@@ -77,7 +91,15 @@ class Filter extends Component {
         break
     }
     return (
-      <FilterPicker onCancel={ this.onCancel } onSure={ this.onSure } data={ data } cols={ cols } />
+      <FilterPicker
+        onCancel={ this.onCancel }
+        onSure={ this.onSure }
+        key={ openType }
+        data={ data }
+        cols={ cols }
+        type={ openType }
+        currentTypeSelectedVal={ currentTypeSelectedVal }
+      />
     )
   }
 
@@ -133,3 +155,11 @@ export default Filter
 // 6、renderFilterPicker()用于渲染FilterPicker组件的内容数据，因此整合了渲染FilterPicker所需的各种数据
 // -、FilterPicker组件中使用到了antd-mobile的PickerView组件，该组件的data属性就是设置数据源的地方，即renderFilterPicker()中整合的data就是为了给PickerView的data属性使用的
 // -、pickerView组件中如果出现内容"偏左"无法居中的情况，说明该组件的cols属性列数设置不合理（antd-mobile默认设置cols值是3），应该根据不同的内容展示合适的列数才能正常"居中"显示
+// 7、Filter组件中必须定义type与currentTypeSelectedVal，将当前pickerView选择的通过props传递给FilterPicker组件内部，以便其内部使用该属性设置选中项的默认值
+// 8、设置默认选中值流程：
+// -、在 Filter 组件中，提供选中值状态：selectedVals
+// -、根据 openType 获取到当前类型的选中值（currentTypeSelectedVal），通过 props 传递给 FilterPicker 组件。
+// -、在 FilterPicker 组件中，将 currentTypeSelectedVal 设置为状态 value 的默认值。
+// -、在点击确定按钮后，在父组件中更新当前 type 对应的 selectedVals 状态值。
+// 9、给FilterPicker添加key属性是为了解决在不销毁FilterPicker组件时pickerView选中的数据无法重新初始化同步更新的问题
+// -、因为state状态属于constructor周期，该周期只会执行一次，如果在组件不销毁的情况下切换pickerView，那么数据不会再次初始化跟随切换更新
