@@ -112,7 +112,8 @@ class Filter extends Component {
     filtersPayload.price = price[0]
     filtersPayload.more = more.join()
 
-    console.log(filtersPayload)
+    // 调用父组件中的方法，将拼接好的获取房屋列表的参数传递给父组件
+    this.props.onFiltersParams(filtersPayload)
 
     // 更新状态
     this.setState({
@@ -259,3 +260,4 @@ export default Filter
 // -、st4 在关闭对话框时（onCancel），根据 type 和当前type的选中值，判断当前菜单是否高亮。
 // -、注意：因为 onCancel 方法中，没有 openType 参数，所以，就需要在调用 onCancel 方式时，来传递 openType 参数。
 // 12、拼接获取房屋列表的参数filtersParams时areaKey可能是'area'或者'subway'（二选一）因此需要使用中括号变量语法
+// 13、房屋列表的参数需要交给父组件HouseList，因为获取的访问列表需要渲染到HouseList组件中，因此需要在HouseList/index.js中定义方法交给当前Filter组件调用
