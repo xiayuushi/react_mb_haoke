@@ -1,8 +1,10 @@
 import { Component } from 'react'
 import { Flex } from 'antd-mobile'
+import { List } from 'react-virtualized'
 import XxxSearchHeader from '../../components/XxxSearchHeader'
 import styles from './index.module.scss'
 import Filter from './components/Filter'
+import XxxHouseItem from '../../components/XxxHouseItem'
 
 const { label, value: cityId } = JSON.parse(localStorage.getItem('hkzf_city'))
 
@@ -25,6 +27,22 @@ class HouseList extends Component {
     this.setState(() => ({ list, count }))
   }
 
+  rowRenderer = ({ key, index, style }) => {
+    const { list } = this.state
+    const item = list[index]
+    return (
+      <XxxHouseItem 
+        key={ key }
+        style={ style }
+        tags={ item.tags }
+        desc={ item.desc }
+        title={ item.title }
+        price={ item.price }
+        src={ process.env.REACT_APP_URL + item.houseImg }
+      />
+    )
+  }
+
   componentDidMount () {
     this.getHouseList()
   }
@@ -41,6 +59,17 @@ class HouseList extends Component {
 
         {/* 条件筛选栏 */}
         <Filter onFiltersParams={ this.onFiltersParams } />
+
+        {/* 房源列表 */}
+        <div className={ styles['bottom'] }>
+          <List 
+            width={ 300 }
+            height={ 300 }
+            rowCount={ this.state.count }  
+            rowHeight={ 120 }
+            rowRenderer={ this.rowRenderer }
+          />
+        </div>
       </div>
     )
   }

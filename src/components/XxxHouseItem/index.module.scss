@@ -1,0 +1,81 @@
+.item {
+  height: 6rem;
+  padding: .5rem 0;
+  display: flex;
+  overflow: hidden;
+  border-bottom: .05rem solid #e5e5e5;
+
+  >img {
+    width: 5.3rem;
+    height: 4rem;
+    margin-right: .5rem;
+  }
+
+  .content {
+    display: flex;
+    height: 4rem;
+    flex-direction: column;
+    justify-content: space-around;
+    flex: 1;
+
+    .title {
+      padding: 0;
+      margin: 0;
+      font-size: .8rem;
+      font-weight: 600;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .desc {
+      color: #dadbdc;
+      font-size: .6rem;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: middle;
+    }
+
+    .tags {
+      display: flex;
+
+      >span {
+        padding: .1rem;
+        font-size: .6rem;
+        color: #94dce4;
+        background-color: #e1f5f8;
+        margin-right: .2rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+
+        &.tag1 {
+          color: #39becd;
+          background: #e1f5f8;
+        }
+
+        &.tag2 {
+          color: #3fc28c;
+          background: #e1f5ed;
+        }
+
+        &.tag3 {
+          color: #5aabfd;
+          background: #e6f2ff;
+        }
+      }
+    }
+
+    .price {
+      font-size: .8rem;
+      color: #fcaca1;
+      font-weight: 600;
+
+      >span {
+        font-weight: normal;
+        font-size: .6rem;
+      }
+    }
+  }
+}
