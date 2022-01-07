@@ -59,6 +59,7 @@ class Filter extends Component {
     const { titleSelectedStatus, selectedVals } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     const currentValList = selectedVals[openType]
+    // 以下判断的作用：在初始默认的值时点'取消'，会根据之前选中的值的状态来将对应的标题菜单高亮
     if (openType === 'area' && (currentValList[0] !== 'area' || currentValList.length !== 2)) {
       newTitleSelectedStatus[openType] = true
     } else if (openType === 'mode' && currentValList[0] !== 'null') {
@@ -81,6 +82,7 @@ class Filter extends Component {
     const { titleSelectedStatus } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     const currentValList = value
+    // 以下判断的作用：在初始默认的值时点'确定'不会将对应的标题菜单高亮
     if (openType === 'area' && (currentValList[0] !== 'area' || currentValList.length !== 2)) {
       newTitleSelectedStatus[openType] = true
     } else if (openType === 'mode' && currentValList[0] !== 'null') {
@@ -92,15 +94,32 @@ class Filter extends Component {
     } else {
       newTitleSelectedStatus[openType] = false
     }
-    this.setState((state) => ({
-        openType: '',
-        selectedVals: {
-          ...state.selectedVals,
-          [openType]: value
-        },
-        titleSelectedStatus: newTitleSelectedStatus
-      })
-    )
+
+    // 拼接获取房屋列表接口所需参数
+    const newSelectedVals = {
+      ...this.state.selectedVals,
+      [openType]: value
+    }
+    const { area, mode, price, more } = newSelectedVals
+    const filtersPayload = {}
+    const areaKey = area[0]
+    let areaVal = 'null'
+    if (area.length === 3) {
+      areaVal = area[2] !== 'null' ? area[2] : area[1]
+    }
+    filtersPayload[areaKey] = areaVal
+    filtersPayload.mode = mode[0]
+    filtersPayload.price = price[0]
+    filtersPayload.more = more.join()
+
+    console.log(filtersPayload)
+
+    // 更新状态
+    this.setState({
+      openType: '',
+      selectedVals: newSelectedVals,
+      titleSelectedStatus: newTitleSelectedStatus
+    })
   }
 
   getFiltersData = async () => {
@@ -239,3 +258,4 @@ export default Filter
 // -、st3 在点击确定按钮时，根据参数 type 和 value，判断当前菜单是否高亮。
 // -、st4 在关闭对话框时（onCancel），根据 type 和当前type的选中值，判断当前菜单是否高亮。
 // -、注意：因为 onCancel 方法中，没有 openType 参数，所以，就需要在调用 onCancel 方式时，来传递 openType 参数。
+// 12、拼接获取房屋列表的参数filtersParams时areaKey可能是'area'或者'subway'（二选一）因此需要使用中括号变量语法
