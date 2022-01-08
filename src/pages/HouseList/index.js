@@ -1,6 +1,6 @@
 import { Component } from 'react'
 import { Flex } from 'antd-mobile'
-import { List, AutoSizer, WindowScroller } from 'react-virtualized'
+import { List, AutoSizer, WindowScroller, InfiniteLoader } from 'react-virtualized'
 import styles from './index.module.scss'
 import Filter from './components/Filter'
 import XxxHouseItem from '../../components/XxxHouseItem'
@@ -30,7 +30,17 @@ class HouseList extends Component {
   rowRenderer = ({ key, index, style }) => {
     const { list } = this.state
     const item = list[index]
+    // 增加判断，防止当数据请求回来不及时，导致undefined取值报错
+    if (!item) {
+      return (
+        <div key={ key } style={ style }>
+          <p className={ styles['loading'] }></p>
+        </div>
+      )
+    }
     return (
+      // 因为XxxHouseItem是与react-virtualized的List组件配合使用
+      // 因此封装XxxHouseItem时，也要考虑接收List组件的style属性
       <XxxHouseItem 
         key={ key }
         style={ style }
@@ -41,6 +51,27 @@ class HouseList extends Component {
         src={ process.env.REACT_APP_URL + item.houseImg }
       />
     )
+  }
+
+  isRowLoaded = ({ index }) => {
+    return !!this.state.list[index]
+  }
+  
+  loadMoreRows = ({ startIndex, stopIndex }) => {
+    return new Promise((resolve, reject) => {
+      this.$request('/houses', 'get', {
+        cityId,
+        start: startIndex,
+        end: stopIndex,
+        ...this.filtersParams
+      }).then(res => {
+        // 此处是数据拼接，基于this.getHouseList()请求回来的20条数据基础上做数据拼接
+        // this.getHouseList()请求回来的20条数据在前，基于它重新请求回来的数据在后（每次10条），新旧数据都需要展开
+        // 如果需要更改重新请求回来的数据条数（默认10条），可以在InfiniteLoader中添加minimumBatchSize属性设置新的每次请求条数
+        this.setState(state => ({ list: [...state.list, ...res.body.list] }))
+        resolve()
+      }).catch(err => reject(err))
+    })
   }
 
   componentDidMount () {
@@ -62,29 +93,36 @@ class HouseList extends Component {
 
         {/* 房源列表 */}
         <div className={ styles['bottom'] }>
-          <WindowScroller>
+          <InfiniteLoader isRowLoaded={ this.isRowLoaded } loadMoreRows={ this.loadMoreRows } rowCount={ this.state.count } minimumBatchSize={10}>
             {
-              ({ height, isScrolling, scrollTop }) => (
-                <AutoSizer>
+              ({ onRowsRendered, registerChild }) => (
+                <WindowScroller>
                   {
-                    ({ width }) => (
-                      <List 
-                        width={ width }
-                        height={ height }
-                        rowCount={ this.state.count }  
-                        rowHeight={ 120 }
-                        rowRenderer={ this.rowRenderer }
-                        autoHeight
-                        isScrolling={ isScrolling }
-                        scrollTop={ scrollTop }
-                      />
+                    ({ height, isScrolling, scrollTop }) => (
+                      <AutoSizer>
+                        {
+                          ({ width }) => (
+                            <List 
+                              width={ width }
+                              height={ height }
+                              rowCount={ this.state.count }  
+                              rowHeight={ 120 }
+                              rowRenderer={ this.rowRenderer }
+                              autoHeight
+                              isScrolling={ isScrolling }
+                              scrollTop={ scrollTop }
+                              onRowsRendered={ onRowsRendered }
+                              ref={ registerChild }
+                            />
+                          )
+                        }
+                      </AutoSizer>
                     )
                   }
-                </AutoSizer>
+                </WindowScroller>
               )
             }
-          </WindowScroller>
-
+          </InfiniteLoader>
         </div>
       </div>
     )
@@ -110,4 +148,10 @@ export default HouseList
 // 6、react-virtualized中的WindowScroller只提供height，没有width属性，因此实现width适应必须使用另一个高阶组件AutoSizer来完成List组件与页面宽度的同步
 // 7、List组件的width与height分别用于设置可视区宽高（看的到的区域）
 // -、List组件的autoHeight属性是配合WindowScroller使用时才必须的属性，该属性用于设置List组件的高度为WindowScroller最终渲染的列表高度（列表可能的高度包含看不到的部分）
-// 8、在使用react-virtualized的InfiniteLoader做无限加载之前，会报错'Cannot read properties of undefined (reading 'tags')'，原因是请求回来的数据一开始只有20条，加载完后没数据导致undefined
+// 8、在使用react-virtualized的InfiniteLoader做无限加载之前，会报错'Cannot read properties of undefined (reading 'tags')'，原因是请求回来的数据一开始只有20条，加载完这20条后没数据导致undefined
+// 9、react-virtualized的InfiniteLoader也是一个HOC，用于包裹List组件，当滚动列表时加载更多数据实现无限加载
+// -、InfiniteLoader的isRowLoaded属性表示每一行数据是否加载完毕，值是一个回调
+// -、InfiniteLoader的loadMoreRows属性表示是否加载更多数据，值是一个回调，再需要加载数据时会调用该函数，该回调返回一个Promise对象
+// -、InfiniteLoader的rowCount属性表示列表数据的总条数
+// -、InfiniteLoader提供的render-props中onRowsRendered用于设置给List，当List加载时也会触发加载函数
+// -、InfiniteLoader提供的render-props中registerChild用于设置给List的ref属性，相当于是绑定子元素

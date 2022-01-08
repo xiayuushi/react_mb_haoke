@@ -1,9 +1,9 @@
 import styles from './index.module.scss'
 import PropTypes from 'prop-types'
 
-const XxxHouseItem = ({ src, title, desc, tags, price, onClick }) => {
+const XxxHouseItem = ({ src, title, desc, tags, price, onClick, style }) => {
   return (
-    <div className={ styles['item'] } onClick={ onClick }>
+    <div className={ styles['item'] } onClick={ onClick } style={ style }>
       <img src={ src } alt="" />
       <div className={ styles['content'] }>
       <h1 className={ styles['title'] }>{ title }</h1>

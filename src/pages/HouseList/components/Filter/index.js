@@ -126,7 +126,6 @@ class Filter extends Component {
   getFiltersData = async () => {
     const { value } = JSON.parse(localStorage.getItem('hkzf_city'))
     const { body } = await this.$request(`/houses/condition?id=${value}`)
-    console.log(body)
     this.setState(() => {
       return {
         filtersData: body

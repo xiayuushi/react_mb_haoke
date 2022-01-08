@@ -28,3 +28,11 @@
 .bottom {
   padding: 0 .5rem;
 }
+
+// loading占位符（使用p标签做类似骨架屏效果）
+.loading {
+  background-color: #ccc;
+  height: 110px;
+  line-height: 110px;
+  text-align: center;
+}
