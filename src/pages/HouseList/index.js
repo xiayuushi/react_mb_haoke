@@ -90,7 +90,7 @@ class HouseList extends Component {
         </Flex>
 
         {/* 条件筛选栏 */}
-        <XxxSticky>
+        <XxxSticky height={ 2 }>
           <Filter onFiltersParams={ this.onFiltersParams } />
         </XxxSticky>
 
