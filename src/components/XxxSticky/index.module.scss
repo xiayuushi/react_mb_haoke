@@ -1,0 +1,8 @@
+// 做吸顶效果的样式类
+.fixed {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 1;
+  background-color: #fff;
+}

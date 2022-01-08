@@ -5,6 +5,7 @@ import styles from './index.module.scss'
 import Filter from './components/Filter'
 import XxxHouseItem from '../../components/XxxHouseItem'
 import XxxSearchHeader from '../../components/XxxSearchHeader'
+import XxxSticky from '../../components/XxxSticky'
 
 const { label, value: cityId } = JSON.parse(localStorage.getItem('hkzf_city'))
 
@@ -30,7 +31,7 @@ class HouseList extends Component {
   rowRenderer = ({ key, index, style }) => {
     const { list } = this.state
     const item = list[index]
-    // 增加判断，防止当数据请求回来不及时，导致undefined取值报错
+    // 增加判断，防止当数据请求回来不及时，导致undefined向后取值报错
     if (!item) {
       return (
         <div key={ key } style={ style }>
@@ -89,7 +90,9 @@ class HouseList extends Component {
         </Flex>
 
         {/* 条件筛选栏 */}
-        <Filter onFiltersParams={ this.onFiltersParams } />
+        <XxxSticky>
+          <Filter onFiltersParams={ this.onFiltersParams } />
+        </XxxSticky>
 
         {/* 房源列表 */}
         <div className={ styles['bottom'] }>
@@ -154,4 +157,4 @@ export default HouseList
 // -、InfiniteLoader的loadMoreRows属性表示是否加载更多数据，值是一个回调，再需要加载数据时会调用该函数，该回调返回一个Promise对象
 // -、InfiniteLoader的rowCount属性表示列表数据的总条数
 // -、InfiniteLoader提供的render-props中onRowsRendered用于设置给List，当List加载时也会触发加载函数
-// -、InfiniteLoader提供的render-props中registerChild用于设置给List的ref属性，相当于是绑定子元素
+// -、InfiniteLoader提供的render-props中registerChild用于设置给List的ref属性
