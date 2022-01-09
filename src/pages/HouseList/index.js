@@ -8,8 +8,6 @@ import XxxSearchHeader from '../../components/XxxSearchHeader'
 import XxxSticky from '../../components/XxxSticky'
 import XxxNoHouse from '../../components/XxxNoHouse'
 
-const { label, value: cityId } = JSON.parse(localStorage.getItem('hkzf_city'))
-
 class HouseList extends Component {
   state = {
     list: [],
@@ -27,7 +25,7 @@ class HouseList extends Component {
   getHouseList = async() => {
     this.setState({ isLoading: true })
     Toast.loading('加载中...', 0, null, false)
-    const { body } = await this.$request('/houses', 'get', { cityId, ...this.filtersParams, start: 1, end: 20 })
+    const { body } = await this.$request('/houses', 'get', { cityId: this.cityId, ...this.filtersParams, start: 1, end: 20 })
     const { list, count } = body
     Toast.hide()
     if (count !== 0) {
@@ -69,7 +67,7 @@ class HouseList extends Component {
   loadMoreRows = ({ startIndex, stopIndex }) => {
     return new Promise((resolve, reject) => {
       this.$request('/houses', 'get', {
-        cityId,
+        cityId: this.cityId,
         start: startIndex,
         end: stopIndex,
         ...this.filtersParams
@@ -124,6 +122,9 @@ class HouseList extends Component {
   }
 
   componentDidMount () {
+    const { label, value: cityId } = JSON.parse(localStorage.getItem('hkzf_city'))
+    this.label = label
+    this.cityId = cityId
     this.getHouseList()
   }
 
@@ -134,7 +135,7 @@ class HouseList extends Component {
         {/* 顶部搜索栏 */}
         <Flex className={ styles['top-search'] }>
           <i className="iconfont icon-back" onClick={ () => this.props.history.go(-1) } />
-          <XxxSearchHeader currentCityName={ label } className={ styles['xxx-search-header'] } />
+          <XxxSearchHeader currentCityName={ this.label } className={ styles['xxx-search-header'] } />
         </Flex>
 
         {/* 条件筛选栏 */}
@@ -177,3 +178,11 @@ export default HouseList
 // -、InfiniteLoader的rowCount属性表示列表数据的总条数
 // -、InfiniteLoader提供的render-props中onRowsRendered用于设置给List，当List加载时也会触发加载函数
 // -、InfiniteLoader提供的render-props中registerChild用于设置给List的ref属性
+// 10、在组件之外写的代码，只会在组件加载时执行一次（或者刷新页面时执行一次），在切换路由时不会重新执行，这涉及到代码执行顺序的问题
+// --、例如：从localStorage中获取城市数据的代码，如果放在组件之外，那么当切换城市时（切换路由），当前组件的城市不会立即同步切换，必须重新刷新页面后才会更新
+// --、因此，如果想要让城市随页面切换时同步切换，则必须将代码放入组件内，例如componentDidMount中
+// --、st1 注释掉组件外部获取当前定位城市信息的代码
+// --、st2 导入utils目录中封装的getCurrentCity()来获取当前定位城市信息，
+// --、st3 在组件componentDidMount周期中调用getCurrentCity()来获取当前定位城市信息（或者忽略st2，直接将之前放于组件外部的代码移入）
+// --、st4 将需要用到的定位城市信息对象的数据绑定到组件this上，通过this访问，例如 this.label 或者 this.value
+// --、st5 当前组件原先通过label与value访问的定位城市数据，改成this.label与this.value

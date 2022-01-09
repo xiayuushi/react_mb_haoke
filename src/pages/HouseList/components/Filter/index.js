@@ -78,7 +78,6 @@ class Filter extends Component {
   }
 
   onSure = (openType, value) => {
-    console.log(openType, value)
     const { titleSelectedStatus } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     const currentValList = value
