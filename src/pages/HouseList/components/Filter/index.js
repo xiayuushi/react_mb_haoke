@@ -27,6 +27,7 @@ class Filter extends Component {
   }
 
   onTitleClick = (clickItem) => {
+    this.htmlBody.className = styles['overflow']
     const { titleSelectedStatus, selectedVals } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     Object.keys(titleSelectedStatus).forEach(item => {
@@ -56,6 +57,7 @@ class Filter extends Component {
   }
 
   onCancel = (openType) => {
+    this.htmlBody.classList.remove(styles['overflow'])
     const { titleSelectedStatus, selectedVals } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     const currentValList = selectedVals[openType]
@@ -78,6 +80,7 @@ class Filter extends Component {
   }
 
   onSure = (openType, value) => {
+    this.htmlBody.classList.remove(styles['overflow'])
     const { titleSelectedStatus } = this.state
     const newTitleSelectedStatus = { ...titleSelectedStatus }
     const currentValList = value
@@ -188,6 +191,7 @@ class Filter extends Component {
   }
 
   componentDidMount () {
+    this.htmlBody = document.body
     this.getFiltersData()
   }
 
@@ -259,3 +263,12 @@ export default Filter
 // -、注意：因为 onCancel 方法中，没有 openType 参数，所以，就需要在调用 onCancel 方式时，来传递 openType 参数。
 // 12、拼接获取房屋列表的参数filtersParams时areaKey可能是'area'或者'subway'（二选一）因此需要使用中括号变量语法
 // 13、房屋列表的参数需要交给父组件HouseList，因为获取的访问列表需要渲染到HouseList组件中，因此需要在HouseList/index.js中定义方法交给当前Filter组件调用
+// 14、展示条件筛选对话框后，页面依旧可以进行上下滚动的问题
+// --、st1 在componentDidMount周期中，获取body，并储存在this中
+// --、st2 在展示对话框时（即调用onTitleClick方法时），给body添加预先定义好的样式类 
+// --、st3 在关闭对话框时（即调用onSure或者onCancel方法时），给body移除预先定义好的样式类 
+// --、注意 样式类中只需要将垂直滚动条取消即可，设置body的样式为 overflow: hidden; 
+// 14、js移除类的方式有两种
+// --、Q1 直接移除所有的类 DOM.className=''
+// --、Q2 从多个类中移除指定的单个类 DOM.classList.remove('不带点号的样式类名')
+

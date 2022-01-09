@@ -18,6 +18,7 @@ class HouseList extends Component {
   filtersParams = {}
 
   onFiltersParams = (filtersParams) => {
+    window.scroll(0, 0)
     this.filtersParams = filtersParams
     this.getHouseList()
   }
@@ -186,3 +187,5 @@ export default HouseList
 // --、st3 在组件componentDidMount周期中调用getCurrentCity()来获取当前定位城市信息（或者忽略st2，直接将之前放于组件外部的代码移入）
 // --、st4 将需要用到的定位城市信息对象的数据绑定到组件this上，通过this访问，例如 this.label 或者 this.value
 // --、st5 当前组件原先通过label与value访问的定位城市数据，改成this.label与this.value
+// 11、window.scroll(0, 0)滚动条重置，当筛选条件发生改变后得到的数据也是不同的，因此需要将滚动条重置到初始位置
+// --、可以考虑在onSure或者onCancel中进行重置滚动条，但是两个方法都会在onFiltersParams中进行传递，因此只需要在onFiltersParams中去调用window.scrollTo(0，0)就可以了

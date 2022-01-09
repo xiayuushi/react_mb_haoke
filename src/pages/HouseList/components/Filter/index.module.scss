@@ -17,3 +17,8 @@
     background-color: #fff;
   }
 }
+
+// 用于解决点击条件筛选栏（搜索栏下方的导航栏）时，房源列表数据依旧能够滚动的类样式
+.overflow {
+  overflow: hidden;
+}
