@@ -1,5 +1,5 @@
 import { Component } from 'react'
-import { Flex } from 'antd-mobile'
+import { Flex, Toast } from 'antd-mobile'
 import { List, AutoSizer, WindowScroller, InfiniteLoader } from 'react-virtualized'
 import styles from './index.module.scss'
 import Filter from './components/Filter'
@@ -12,7 +12,8 @@ const { label, value: cityId } = JSON.parse(localStorage.getItem('hkzf_city'))
 class HouseList extends Component {
   state = {
     list: [],
-    count: 0
+    count: 0,
+    isLoading: false
   }
 
   filtersParams = {}
@@ -23,9 +24,15 @@ class HouseList extends Component {
   }
 
   getHouseList = async() => {
+    this.setState({ isLoading: true })
+    Toast.loading('加载中...', 0, null, false)
     const { body } = await this.$request('/houses', 'get', { cityId, ...this.filtersParams, start: 1, end: 20 })
     const { list, count } = body
-    this.setState(() => ({ list, count }))
+    Toast.hide()
+    if (count !== 0) {
+      Toast.info(`共找到${count}套房源`, 2, null, false)
+    }
+    this.setState(() => ({ list, count, isLoading: false }))
   }
 
   rowRenderer = ({ key, index, style }) => {
@@ -75,6 +82,44 @@ class HouseList extends Component {
     })
   }
 
+  renderHouseList = () => {
+    if (this.state.count === 0 && !this.state.isLoading) {
+      return '有找到房源，请您换个搜索条件吧~'
+    }
+    return (
+      <InfiniteLoader isRowLoaded={ this.isRowLoaded } loadMoreRows={ this.loadMoreRows } rowCount={ this.state.count } minimumBatchSize={10}>
+        {
+          ({ onRowsRendered, registerChild }) => (
+            <WindowScroller>
+              {
+                ({ height, isScrolling, scrollTop }) => (
+                  <AutoSizer>
+                    {
+                      ({ width }) => (
+                        <List 
+                          width={ width }
+                          height={ height }
+                          rowCount={ this.state.count }  
+                          rowHeight={ 120 }
+                          rowRenderer={ this.rowRenderer }
+                          autoHeight
+                          isScrolling={ isScrolling }
+                          scrollTop={ scrollTop }
+                          onRowsRendered={ onRowsRendered }
+                          ref={ registerChild }
+                        />
+                      )
+                    }
+                  </AutoSizer>
+                )
+              }
+            </WindowScroller>
+          )
+        }
+      </InfiniteLoader>
+    )
+  }
+
   componentDidMount () {
     this.getHouseList()
   }
@@ -96,36 +141,7 @@ class HouseList extends Component {
 
         {/* 房源列表 */}
         <div className={ styles['bottom'] }>
-          <InfiniteLoader isRowLoaded={ this.isRowLoaded } loadMoreRows={ this.loadMoreRows } rowCount={ this.state.count } minimumBatchSize={10}>
-            {
-              ({ onRowsRendered, registerChild }) => (
-                <WindowScroller>
-                  {
-                    ({ height, isScrolling, scrollTop }) => (
-                      <AutoSizer>
-                        {
-                          ({ width }) => (
-                            <List 
-                              width={ width }
-                              height={ height }
-                              rowCount={ this.state.count }  
-                              rowHeight={ 120 }
-                              rowRenderer={ this.rowRenderer }
-                              autoHeight
-                              isScrolling={ isScrolling }
-                              scrollTop={ scrollTop }
-                              onRowsRendered={ onRowsRendered }
-                              ref={ registerChild }
-                            />
-                          )
-                        }
-                      </AutoSizer>
-                    )
-                  }
-                </WindowScroller>
-              )
-            }
-          </InfiniteLoader>
+          { this.renderHouseList() }
         </div>
       </div>
     )
