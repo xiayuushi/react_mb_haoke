@@ -6,6 +6,7 @@ import Filter from './components/Filter'
 import XxxHouseItem from '../../components/XxxHouseItem'
 import XxxSearchHeader from '../../components/XxxSearchHeader'
 import XxxSticky from '../../components/XxxSticky'
+import XxxNoHouse from '../../components/XxxNoHouse'
 
 const { label, value: cityId } = JSON.parse(localStorage.getItem('hkzf_city'))
 
@@ -84,7 +85,9 @@ class HouseList extends Component {
 
   renderHouseList = () => {
     if (this.state.count === 0 && !this.state.isLoading) {
-      return '有找到房源，请您换个搜索条件吧~'
+      return (
+        <XxxNoHouse>没有找到房源，请您换个搜索条件吧~</XxxNoHouse>
+      )
     }
     return (
       <InfiniteLoader isRowLoaded={ this.isRowLoaded } loadMoreRows={ this.loadMoreRows } rowCount={ this.state.count } minimumBatchSize={10}>
