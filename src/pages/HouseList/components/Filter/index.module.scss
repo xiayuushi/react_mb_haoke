@@ -1,6 +1,7 @@
 .filter-container {
   position: relative;
   z-index: 4;
+  height: 2rem;
   background-color: #fff;
   .mask {
     position: fixed;
@@ -12,8 +13,9 @@
     background-color: rgba(0, 0, 0, .5);
   }
   .content {
-    position: relative;
+    position: absolute;
     z-index: 4;
+    width: 100%;
     background-color: #fff;
   }
 }

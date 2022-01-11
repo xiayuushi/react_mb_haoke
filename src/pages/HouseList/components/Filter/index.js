@@ -1,4 +1,5 @@
 import { Component } from 'react'
+import { Spring, animated  } from 'react-spring'
 import styles from './index.module.scss'
 import FilterTitle from '../FilterTitle'
 import FilterPicker from '../FilterPicker'
@@ -190,6 +191,19 @@ class Filter extends Component {
     )
   }
 
+  renderMask = () => {
+    const isHideMask = this.state.openType === 'more' || this.state.openType === ''
+    // if (isHideMask) return null
+    return (
+      <Spring from={{ opacity: 0 }} to={{ opacity: isHideMask ? 0 : 1 }}>
+        { style => {
+          if (style.opacity === 0) return null
+          return (<animated.div className={ styles['mask'] } style={ style } onClick={ this.onCancel }></animated.div>)
+        }}
+      </Spring>
+    )
+  }
+
   componentDidMount () {
     this.htmlBody = document.body
     this.getFiltersData()
@@ -201,9 +215,7 @@ class Filter extends Component {
 
         {/* 前三个菜单的遮罩层 */}
         {
-          this.state.openType === 'area' || this.state.openType === 'mode' || this.state.openType === 'price'
-          ? <div className={ styles['mask'] } onClick={ this.onCancel }></div>
-          : null
+          this.renderMask()
         }
 
         <div className={ styles['content'] }>
@@ -271,4 +283,18 @@ export default Filter
 // 14、js移除类的方式有两种
 // --、Q1 直接移除所有的类 DOM.className=''
 // --、Q2 从多个类中移除指定的单个类 DOM.classList.remove('不带点号的样式类名')
+// 15、使用react-spring动画库来实现遮罩层动画：
+// --、创建方法 renderMask 来渲染遮罩层 div。
+// --、修改渲染遮罩层的逻辑，保证 Spring 组件一直都被渲染（Spring 组件都被销毁了，就无法实现动画效果）。
+// --、修改 to 属性的值，在遮罩层隐藏时为 0，在遮罩层展示时为 1。
+// --、在 render-props 的函数内部，判断 style.opacity 是否等于 0。
+// --、如果等于 0，就返回 null（不渲染遮罩层），解决遮罩层遮挡页面导致顶部导航失效问题。
+// --、如果不等于 0，渲染遮罩层 div。
+// --、必须确保Spring组件一直被渲染，否则消失的动画出不来，因此必须注释掉上面的 'if (isHideMask) return null'
+// 16、react-spring动画库的使用流程（以Spring组件的render-props模式为例）
+// --、st1、安装react-spring，并解构出Spring组件与animated修饰符
+// --、st2、使用Spring组件通过render-props的方式包裹需要做动画的元素
+// --、st3、Spring组件设置from属性用于初次状态（后续不会变化，因此就算from属性不设置也不影响后续动画效果）、设置to属性用于做状态变化
+// --、st4、Spring组件render-props模式通过形参变量复用动画库中的样式，并设置给需要做动画的元素的style属性
+// --、st5、做动画的元素前面加上animated修饰符
 
