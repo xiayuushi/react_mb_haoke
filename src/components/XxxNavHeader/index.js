@@ -7,10 +7,11 @@ const XxxNavHeader = (props) => {
   const onDefaultBehavior = () => props.history.go(-1)
   return (
     <NavBar
-      className={ styles['navbar'] }
+      className={ [styles['navbar'], props.className || ''].join(' ') }
       mode="light"
       icon={ <i className="iconfont icon-back" /> }
-      onLeftClick={ props.onLeftClick || onDefaultBehavior } >
+      onLeftClick={ props.onLeftClick || onDefaultBehavior }
+      rightContent={ props.rightContent }>
       { props.children }
     </NavBar>
   )
@@ -18,6 +19,8 @@ const XxxNavHeader = (props) => {
 
 XxxNavHeader.propTypes = {
   onLeftClick: PropTypes.func,
+  className: PropTypes.string,
+  rightContent: PropTypes.array,
   children: PropTypes.string.isRequired
 }
 

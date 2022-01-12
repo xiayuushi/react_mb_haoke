@@ -197,7 +197,7 @@ class Filter extends Component {
     return (
       <Spring from={{ opacity: 0 }} to={{ opacity: isHideMask ? 0 : 1 }}>
         { style => {
-          if (style.opacity === 0) return null
+          if (isHideMask || style.opacity === 0) return null
           return (<animated.div className={ styles['mask'] } style={ style } onClick={ this.onCancel }></animated.div>)
         }}
       </Spring>

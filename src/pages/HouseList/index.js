@@ -56,6 +56,7 @@ class HouseList extends Component {
         desc={ item.desc }
         title={ item.title }
         price={ item.price }
+        onClick={ () => this.props.history.push(`/detail/${item.houseCode}`) }
         src={ process.env.REACT_APP_URL + item.houseImg }
       />
     )
