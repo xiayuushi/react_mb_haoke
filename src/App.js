@@ -4,6 +4,7 @@ import Home from './pages/Home'
 import CityList from './pages/CityList'
 import Map from './pages/Map'
 import Detail from './pages/HouseDetail'
+import Login from './pages/Login'
 
 const App = () => (
   <Router>
@@ -14,6 +15,7 @@ const App = () => (
       <Route path="/citylist" component={ CityList } />
       <Route path="/map" component={ Map } />
       <Route path="/detail/:id" component={ Detail } />
+      <Route path="/login" component={ Login } />
     </div>
   </Router>
 )
