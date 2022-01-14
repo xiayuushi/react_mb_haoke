@@ -3,6 +3,7 @@ import { Flex, WingBlank, WhiteSpace, Toast } from 'antd-mobile'
 
 import { Link } from 'react-router-dom'
 import { withFormik } from 'formik'
+import * as Yup from 'yup'
 
 import XxxNavHeader from '../../components/XxxNavHeader'
 
@@ -10,12 +11,12 @@ import styles from './index.module.scss'
 import request from '../../utils/request'
 
 // 验证规则：
-// const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
-// const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
+const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
+const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
 
 class Login extends Component {
   render() {
-    const { values: {username, password}, handleChange, handleSubmit } = this.props
+    const { values: {username, password}, handleChange, handleSubmit, handleBlur, errors, touched } = this.props
     return (
       <div className={styles['root']}>
         {/* 顶部导航 */}
@@ -32,10 +33,13 @@ class Login extends Component {
                 value={ username }
                 onChange={ handleChange }
                 placeholder="请输入账号"
+                onBlur={ handleBlur }
               />
             </div>
             {/* 长度为5到8位，只能出现数字、字母、下划线 */}
-            {/* <div className={styles.error}>账号为必填项</div> */}
+            {
+             errors.username && touched.username && (<div className={styles['error']}>{ errors.username }</div>)
+            }
             <div className={styles['formItem']}>
               <input
                 className={styles['input']}
@@ -44,10 +48,13 @@ class Login extends Component {
                 value={ password }
                 onChange={ handleChange }
                 placeholder="请输入密码"
+                onBlur={ handleBlur }
               />
             </div>
             {/* 长度为5到12位，只能出现数字、字母、下划线 */}
-            {/* <div className={styles.error}>账号为必填项</div> */}
+            {
+              errors.password && touched.password && (<div className={styles['error']}>{ errors.password }</div>)
+            }
             <div className={styles['formSubmit']}>
               <button className={styles['submit']} type="submit">
                 登 录
@@ -78,6 +85,10 @@ Login = withFormik({
       Toast.info(res.description, 2, null, false)
     }
   },
+  validationSchema: Yup.object().shape({
+    username: Yup.string().required('账号为必填项').matches(REG_UNAME, '长度为5-8位，只能出现数字、字母、下划线'),
+    password: Yup.string().required('密码为必填项').matches(REG_PWD, '请输入密码，长度在12位以内')
+  }),
   displayName: 'BasicForm'
 })(Login)
 
@@ -100,3 +111,5 @@ export default Login
 
 // N1、handleSubmit中第二参数formikBag对象就是react组件中原本的一些数据的集合，从中解构出props就可以去操作组件原本的props
 // N2、handleChange指向不同的表单元素的前提是，这些表单元素设置了name属性，且name属性的值与表单的value值绑定的数据名称保持一致
+// N3、touched需要在表单元素上添加onBlur属性绑定handleBlur事件才会生效，用于表示该表单元素是否访问过（访问过再触发才是合理的）
+// N4、errors是用于表单验证不通过时的提示信息，当某个表单元素验证不通过时，才让表单提示验证错误提示出现
