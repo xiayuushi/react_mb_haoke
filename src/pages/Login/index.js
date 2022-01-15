@@ -2,7 +2,7 @@ import React, { Component } from 'react'
 import { Flex, WingBlank, WhiteSpace, Toast } from 'antd-mobile'
 
 import { Link } from 'react-router-dom'
-import { withFormik } from 'formik'
+import { withFormik, Form, Field, ErrorMessage } from 'formik'
 import * as Yup from 'yup'
 
 import XxxNavHeader from '../../components/XxxNavHeader'
@@ -11,12 +11,12 @@ import styles from './index.module.scss'
 import request from '../../utils/request'
 
 // 验证规则：
+// 长度为5到xxx位，只能出现数字、字母、下划线
 const REG_UNAME = /^[a-zA-Z_\d]{5,8}$/
 const REG_PWD = /^[a-zA-Z_\d]{5,12}$/
 
 class Login extends Component {
   render() {
-    const { values: {username, password}, handleChange, handleSubmit, handleBlur, errors, touched } = this.props
     return (
       <div className={styles['root']}>
         {/* 顶部导航 */}
@@ -25,42 +25,22 @@ class Login extends Component {
 
         {/* 登录表单 */}
         <WingBlank>
-          <form onSubmit={ handleSubmit }>
+          <Form>
             <div className={styles['formItem']}>
-              <input
-                className={styles['input']}
-                name="username"
-                value={ username }
-                onChange={ handleChange }
-                placeholder="请输入账号"
-                onBlur={ handleBlur }
-              />
+              <Field className={styles['input']} name="username" placeholder="请输入账号" />
             </div>
-            {/* 长度为5到8位，只能出现数字、字母、下划线 */}
-            {
-             errors.username && touched.username && (<div className={styles['error']}>{ errors.username }</div>)
-            }
+            {/* 此处使用ErrorMessage组件来替代之前的JSX中的逻辑判断，此处保留注释就是为了进行对比 */}
+            {/* { errors.username && touched.username && (<div className={styles['error']}>{ errors.username }</div>) } */}
+            <ErrorMessage className={styles['error']} component="div" name="username" />
             <div className={styles['formItem']}>
-              <input
-                className={styles['input']}
-                name="password"
-                type="password"
-                value={ password }
-                onChange={ handleChange }
-                placeholder="请输入密码"
-                onBlur={ handleBlur }
-              />
+              <Field className={styles['input']} name="password" type="password" placeholder="请输入密码" />
             </div>
-            {/* 长度为5到12位，只能出现数字、字母、下划线 */}
-            {
-              errors.password && touched.password && (<div className={styles['error']}>{ errors.password }</div>)
-            }
+            {/* 验证格式出错提示：长度为5到12位，只能出现数字、字母、下划线 */}
+            <ErrorMessage className={styles['error']} component="div" name="password" />
             <div className={styles['formSubmit']}>
-              <button className={styles['submit']} type="submit">
-                登 录
-              </button>
+              <button className={styles['submit']} type="submit">登 录</button>
             </div>
-          </form>
+          </Form>
           <Flex className={styles['backHome']}>
             <Flex.Item>
               <Link to="/registe">还没有账号，去注册~</Link>
@@ -105,11 +85,26 @@ export default Login
 // 1、安装formik
 // 2、选择一种formik使用方式（HOC或者render-props这两种方式都可以），解构出对应的使用方式，此处以使用HOC的方式（withFormik）为例
 // 3、组件名 = withFormik(配置项对象)(react组件名)
-// 4、HOC的配置对象中去配置mapPropsToValues、handleSumbit、displayName等
+// 4、HOC的配置对象中去配置mapPropsToValues、handleSumbit、displayName、validate、validationSchema等
 // 5、在组件内部通过props解构出配置好的HOC的相关属性（例如values、handleChange, handleSubmit等）与表单元素的相关属性进行绑定
 // 5、values中的属性与表单value属性表单、handleChange与表单onChange属性绑定、handleSubmit与Form表单的onSubmit绑定
+// 6、在validationSchema配置表单验证规则，可以使用yup这个库进行表单验证
+
+// formik组件的使用
+// 1、使用解构出Form组件替换原本的form标签，使用withFormik时原本的form标签上需要设置的handleSubmit与handleReset就可以省略了（formik的Form组件会自动添加）
+// 2、使用解构出Field组件替换原本的表单元素标签，使用withFormik时原本的input标签上需要设置的value、onBlur与onChange等就可以省略了（formik的Field组件会自动添加）
+// -、对于非input表单（例如 select 则可以为Field设置as属性指向select标签）
+// 3、使用解构出的ErrorMessage组件替换掉JSX中判断提示验证出错的逻辑，且使用component属性指向原先的标签名，name属性指向原先的errors或者touched的验证字段
+// -、之前：{ errors.username && touched.username && (<div className={styles['error']}>{ errors.username }</div>) }
+// -、此时：<ErrorMessage className={styles['error']} component="div" name="username" />
+// -、之前显示错误提示的标签的样式，直接设置给ErrorMessage组件即可
+// -、因此之前为表单元素设置的handleBlur, errors, touched等属性也可以不用设置了
+// 4、移除掉withFormik中解构出props的操作（但是withFormik的配置还是必须保留）
+// 5、使用formik提供的组件来设置表单及表单元素只是简化标签中的属性设置而已，但是withFormik的配置还是必须保留的
 
 // N1、handleSubmit中第二参数formikBag对象就是react组件中原本的一些数据的集合，从中解构出props就可以去操作组件原本的props
 // N2、handleChange指向不同的表单元素的前提是，这些表单元素设置了name属性，且name属性的值与表单的value值绑定的数据名称保持一致
 // N3、touched需要在表单元素上添加onBlur属性绑定handleBlur事件才会生效，用于表示该表单元素是否访问过（访问过再触发才是合理的）
 // N4、errors是用于表单验证不通过时的提示信息，当某个表单元素验证不通过时，才让表单提示验证错误提示出现
+// N5、validate可以手动表单校验，而validationSchema可以使用yup库进行表单校验
+// N6、推荐使用formik + yup处理react与表单验证，使用yup验证时，withFormik配置项应该使用validationSchema
