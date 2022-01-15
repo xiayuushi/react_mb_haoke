@@ -17,10 +17,11 @@ instance.interceptors.response.use(response => {
   return Promise.reject(error)
 })
 
-const request = (url, method = 'get', payload) => {
+const request = (url, method = 'get', payload, headers) => {
   return instance({
     url,
     method,
+    headers,
     [method.toLowerCase() === 'get'? 'params' : 'data']: payload
   })
 }
