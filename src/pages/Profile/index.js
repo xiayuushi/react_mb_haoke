@@ -44,6 +44,8 @@ class Profile extends Component {
       })
     } else {
       // 登录失败
+      removeToken()
+      this.setState({ isLogin: false })
     }
   }
 
@@ -160,3 +162,5 @@ export default Profile
 // -、Q2 已登录 渲染已登录的组件，显示用户与用户的头像，要调用接口请求数据
 // 3、用户退出：弹窗提示，用户点确定退出时，则调用退出接口从服务端退出，同时清理本地缓存的token
 // -、另外也必须重新更新state中的状态（用于驱动视图更新，渲染退出的视图）
+// 4、如果在axios请求拦截器中设置了自动添加请求头携带token，则在请求时就无需手动在调用axios发送请求时添加{ authorization: token }
+// 5、如果在axios响应拦截器中设置了响应失败自动移除token，则在处理登录失败时就无需手动清理token了，此时只需要将isLogin设置为false，让其自动更新视图即可
