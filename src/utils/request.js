@@ -8,7 +8,7 @@ const instance = axios.create({
 })
 
 instance.interceptors.request.use(config => {
-  if (config.url==='/user' && !config.url.startsWith('/user/registered') && !config.url.startsWith('/user/login')) {
+  if (config.url.startsWith('/user') && !config.url.startsWith('/user/registered') && !config.url.startsWith('/user/login')) {
     config.headers.authorization = getToken()
   }
   return config
