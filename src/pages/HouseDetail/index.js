@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 
 import { Carousel, Flex } from 'antd-mobile'
+import { isAuth } from '../../utils/auth'
 
 import XxxNavHeader from '../../components/XxxNavHeader'
 import XxxHouseItem from '../../components/XxxHouseItem'
@@ -57,7 +58,6 @@ const labelStyle = {
 export default class HouseDetail extends Component {
   state = {
     isLoading: false,
-
     houseInfo: {
       // 房屋图片
       houseImg: [],
@@ -90,7 +90,8 @@ export default class HouseDetail extends Component {
       houseCode: '',
       // 房屋描述
       description: ''
-    }
+    },
+    isFavorite: false
   }
 
   getHouseInfo = async() => {
@@ -101,8 +102,19 @@ export default class HouseDetail extends Component {
     const { community, coord } = body
     this.renderMap(community, coord)
   }
-  componentDidMount() {
+
+  checkFavorite = async() => {
+    const isLogin = isAuth()
+    if (!isLogin) return
+    const { id } = this.props.match.params
+    const res = await this.$request(`/user/favorites/${id}`)
+    const { status, body } = res
+    if (status === 200) this.setState({ isFavorite: body.isFavorite })
+  }
+
+  componentDidMount () {
     this.getHouseInfo()
+    this.checkFavorite()
   }
 
   // 渲染轮播图结构
@@ -149,7 +161,7 @@ export default class HouseDetail extends Component {
     map.addOverlay(label)
   }
 
-  // 渲染标签
+  // 渲染tag标签
   renderTags() {
     const { tags } = this.state.houseInfo
     let className = ''
@@ -168,8 +180,10 @@ export default class HouseDetail extends Component {
   }
 
   render() {
-    const { isLoading, 
-      houseInfo: { community, title, price, roomType, size, floor, oriented, description, supporting } 
+    const {
+      isLoading, 
+      isFavorite,
+      houseInfo: { community, title, price, roomType, size, floor, oriented, description, supporting },
     } = this.state
     return (
       <div className={styles.root}>
@@ -304,11 +318,11 @@ export default class HouseDetail extends Component {
         <Flex className={styles.fixedBottom}>
           <Flex.Item>
             <img
-              src={process.env.REACT_APP_URL + '/img/unstar.png'}
+              src={process.env.REACT_APP_URL +  (isFavorite ? '/img/star.png' : '/img/unstar.png')}
               className={styles.favoriteImg}
               alt="收藏"
             />
-            <span className={styles.favorite}>收藏</span>
+            <span className={styles.favorite}>{ isFavorite ? '已收藏' : '收藏' }</span>
           </Flex.Item>
           <Flex.Item>在线咨询</Flex.Item>
           <Flex.Item>
@@ -323,3 +337,6 @@ export default class HouseDetail extends Component {
 }
 
 // 1、renderTags()当标签超过预定义的样式类时，后续以某个类样式为准
+// 2、checkFavorite 检查登录用户是否已收藏当前房源
+// -、用户未登录不发请求检查当前房源收藏情况，用户已登录则发请求检查当前房源收藏情况
+// -、isFavorite用户是否收藏当前房源，后续会根据该布尔值来显示底部收藏按钮不同的图片及文本
