@@ -26,4 +26,7 @@ export default XxxRoute
 // -、Route组件render属性中的props就是路由中的属性集合
 // 6、Redirect组件的to属性指向目标路由的相关配置，pathname属性是目标路由路径，state属性用于配置路由附加的额外信息
 // -、此处state.from的值props.location就是登录成功后要跳转的页面地址
+// -、后续可以通过props.location.state是否有值来判断是未登录导致重定向到登录页的，还是直接从登录页进行登录的
+// -、Q1 在登录成功的逻辑中，如果props.location.state.from没有数据，说明是直接从个人中心的登录按钮进行登录的，此时登录成功后可以返回到之前的个人中心页props.history.go(-1)
+// -、Q2 在登录成功的逻辑中，如果props.location.state.from有数据，说明是未登录被鉴权路由拦下导致的重定向到登录页，此时登录成功后应该返回到props.location.state.from指定的目标页
 // N1、render-props模式，即 为组件定义属性，属性值中通过回调的方式渲染返回JSX，是react组件复用状态的方式之一

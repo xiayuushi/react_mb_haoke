@@ -56,11 +56,12 @@ Login = withFormik({
   mapPropsToValues: () => ({ username: '', password: '' }),
   handleSubmit: async (values, { props }) => {
     const res = await request('/user/login', 'post', values)
-    console.log(res)
     if (res.status === 200) {
       Toast.info('登录成功', 1, null, false)
       localStorage.setItem('hkzf_token', res.body)
-      props.history.go(-1)
+      !props.location.state
+        ? props.history.go(-1)
+        : props.history.replace(props.location.state.from.pathname)
     } else {
       Toast.info(res.description, 2, null, false)
     }
@@ -101,6 +102,16 @@ export default Login
 // -、因此之前为表单元素设置的handleBlur, errors, touched等属性也可以不用设置了
 // 4、移除掉withFormik中解构出props的操作（但是withFormik的配置还是必须保留）
 // 5、使用formik提供的组件来设置表单及表单元素只是简化标签中的属性设置而已，但是withFormik的配置还是必须保留的
+
+// 1、在App.js中使用自定义封装的鉴权路由组件配置路由，例如： <XxxRoute path="/xxx" component={Xxx} />
+// -、可以通过props.location.state是否有值来判断是未登录导致重定向到登录页的，还是直接从登录页进行登录的
+// -、Q1 在登录成功的逻辑中，如果props.location.state.from没有数据，说明是直接从个人中心的登录按钮进行登录的，此时登录成功后可以返回到之前的个人中心页props.history.go(-1)
+// -、Q2 在登录成功的逻辑中，如果props.location.state.from有数据，说明是未登录被鉴权路由拦下导致的重定向到登录页，此时登录成功后应该返回到props.location.state.from指定的目标页
+// 2、props.history.push()与props.history.replace() 跳转路由的区别
+// -、以使用鉴权路由从Home页跳转到Map页为例，props.history.push()是先从Home页面被鉴权路由重定向到Login登录页，登录后再跳到Map页（返回时，则从Map到Login再到Home）
+// -、以使用鉴权路由从Home页跳转到Map页为例，props.history.replace()是从Home页面被鉴权路由重定向到Login登录页，登录后再跳到Map页（返回时，则从Map直接到Home，不会再经过Login）
+// -、即 props.history.push() 进栈与出栈都是逐级操作，例如：登录Home->Login->Map 与  返回Map->Login->Home
+// -、即 props.history.replace() 出栈时是替换操作，将Login替换成Home ，例如：登录Home->Login->Map 与  返回Map->Home（此时Home替换掉了Login，返回时不再经过Login）
 
 // N1、handleSubmit中第二参数formikBag对象就是react组件中原本的一些数据的集合，从中解构出props就可以去操作组件原本的props
 // N2、handleChange指向不同的表单元素的前提是，这些表单元素设置了name属性，且name属性的值与表单的value值绑定的数据名称保持一致

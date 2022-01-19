@@ -5,6 +5,7 @@ import CityList from './pages/CityList'
 import Map from './pages/Map'
 import Detail from './pages/HouseDetail'
 import Login from './pages/Login'
+import XxxRoute from './components/XxxRoute'
 
 const App = () => (
   <Router>
@@ -13,7 +14,8 @@ const App = () => (
       <Route path="/" exact render={ () => (<Redirect to="/home" />) } />
       <Route path="/home" component={ Home } />
       <Route path="/citylist" component={ CityList } />
-      <Route path="/map" component={ Map } />
+      {/* <Route path="/map" component={ Map } /> */}
+      <XxxRoute path="/map" component={ Map } />
       <Route path="/detail/:id" component={ Detail } />
       <Route path="/login" component={ Login } />
     </div>
