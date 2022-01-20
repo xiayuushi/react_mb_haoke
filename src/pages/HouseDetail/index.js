@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import { Carousel, Flex } from 'antd-mobile'
+import { Carousel, Flex, Modal, Toast } from 'antd-mobile'
 import { isAuth } from '../../utils/auth'
 
 import XxxNavHeader from '../../components/XxxNavHeader'
@@ -8,6 +8,8 @@ import XxxHouseItem from '../../components/XxxHouseItem'
 import XxxHousePackage from '../../components/XxxHousePackage'
 
 import styles from './index.module.scss'
+
+const alert = Modal.alert
 
 // 猜你喜欢
 const recommendHouses = [
@@ -55,9 +57,10 @@ const labelStyle = {
   userSelect: 'none'
 }
 
-export default class HouseDetail extends Component {
+class HouseDetail extends Component {
   state = {
     isLoading: false,
+    isFavorite: false,
     houseInfo: {
       // 房屋图片
       houseImg: [],
@@ -90,26 +93,52 @@ export default class HouseDetail extends Component {
       houseCode: '',
       // 房屋描述
       description: ''
-    },
-    isFavorite: false
+    }
   }
 
-  getHouseInfo = async() => {
+  getHouseInfo = async () => {
     this.setState({isLoading: true })
     const { id } = this.props.match.params
-    const { body } = await this.$request(`/houses/${id}`,'get')
+    const { body } = await this.$request(`/houses/${id}`)
     this.setState({ houseInfo: body, isLoading: false })
     const { community, coord } = body
     this.renderMap(community, coord)
   }
 
-  checkFavorite = async() => {
+  checkFavorite = async () => {
     const isLogin = isAuth()
     if (!isLogin) return
     const { id } = this.props.match.params
-    const res = await this.$request(`/user/favorites/${id}`)
-    const { status, body } = res
+    const { status, body } = await this.$request(`/user/favorites/${id}`)
     if (status === 200) this.setState({ isFavorite: body.isFavorite })
+  }
+
+  handlerFavorite = async () => {
+    const isLogin = isAuth()
+    if (!isLogin) {
+      return alert('请登录后再操作', '是否现在跳转到登录页?', [
+        { text: '取消' },
+        { text: '确定', onPress: () => this.props.history.push('/login', { from: this.props.location }) }
+      ])
+    }
+    const { id } = this.props.match.params
+    if (this.state.isFavorite) {
+      this.setState({ isFavorite: false })
+      const res = await this.$request(`/user/favorites/${id}`, 'delete')
+      if (res.status === 200) {
+        Toast.info('已取消收藏', 1, null, false)
+      } else {
+        Toast.info('登录超时，请重新登录', 1, null, false)
+      }
+    } else {
+      const res = await this.$request(`/user/favorites/${id}`, 'post')
+      if (res.status === 200) {
+        this.setState({ isFavorite: true })
+        Toast.info('收藏成功', 1, null, false)
+      } else {
+        Toast.info('登录超时，请重新登录', 1, null, false)
+      }
+    }
   }
 
   componentDidMount () {
@@ -120,7 +149,6 @@ export default class HouseDetail extends Component {
   // 渲染轮播图结构
   renderSwipers() {
     const { houseImg } = this.state.houseInfo
-
     return houseImg.map(item => (
       <a
         key={item}
@@ -316,7 +344,7 @@ export default class HouseDetail extends Component {
 
         {/* 底部收藏按钮 */}
         <Flex className={styles.fixedBottom}>
-          <Flex.Item>
+          <Flex.Item onClick={ this.handlerFavorite }>
             <img
               src={process.env.REACT_APP_URL +  (isFavorite ? '/img/star.png' : '/img/unstar.png')}
               className={styles.favoriteImg}
@@ -336,7 +364,15 @@ export default class HouseDetail extends Component {
   }
 }
 
+export default HouseDetail
+
 // 1、renderTags()当标签超过预定义的样式类时，后续以某个类样式为准
 // 2、checkFavorite 检查登录用户是否已收藏当前房源
 // -、用户未登录不发请求检查当前房源收藏情况，用户已登录则发请求检查当前房源收藏情况
 // -、isFavorite用户是否收藏当前房源，后续会根据该布尔值来显示底部收藏按钮不同的图片及文本
+// 3、props.history.push()第二参数是可选的状态
+// -、这个第二参数与自定义封装鉴权路由组件XxxRoute组件时其中Redirect组件的to属性的state对象中的键(from)保持一致即可
+// 4、handlerFavorite 用户未登录点击收藏时提醒其登录，登录后重定向回当前页
+// -、根据isFavorite的值来调用接口做不同的逻辑
+// -、Q1 值为true 则调用删除收藏接口，取消收藏
+// -、Q2 值为false 则调用添加收藏接口，添加收藏
