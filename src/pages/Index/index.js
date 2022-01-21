@@ -13,7 +13,7 @@ const navDataList = [
   { id: 1, img: navImg1, title: '整租', path: '/home/list' },
   { id: 2, img: navImg2, title: '合租', path: '/home/index' },
   { id: 3, img: navImg3, title: '地图找房', path: '/home/map' },
-  { id: 4, img: navImg4, title: '去出租', path: '/home/rent' },
+  { id: 4, img: navImg4, title: '去出租', path: '/rent/add' },
 ]
 
 class Index extends Component {

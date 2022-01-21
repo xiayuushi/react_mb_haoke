@@ -5,6 +5,10 @@ import CityList from './pages/CityList'
 import Map from './pages/Map'
 import Detail from './pages/HouseDetail'
 import Login from './pages/Login'
+import XxxRoute from './components/XxxRoute'
+import Rent from './pages/Rent'
+import RentAdd from './pages/Rent/Add'
+import RentSearch from './pages/Rent/Search'
 
 const App = () => (
   <Router>
@@ -16,6 +20,9 @@ const App = () => (
       <Route path="/map" component={ Map } />
       <Route path="/detail/:id" component={ Detail } />
       <Route path="/login" component={ Login } />
+      <XxxRoute path="/rent" exact component={ Rent } />
+      <XxxRoute path="/rent/add" component={ RentAdd } />
+      <XxxRoute path="/rent/search" component={ RentSearch } />
     </div>
   </Router>
 )

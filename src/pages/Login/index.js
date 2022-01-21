@@ -55,15 +55,15 @@ class Login extends Component {
 Login = withFormik({
   mapPropsToValues: () => ({ username: '', password: '' }),
   handleSubmit: async (values, { props }) => {
-    const res = await request('/user/login', 'post', values)
-    if (res.status === 200) {
+    const { status, body, description } = await request('/user/login', 'post', values)
+    if (status === 200) {
       Toast.info('登录成功', 1, null, false)
-      localStorage.setItem('hkzf_token', res.body)
+      localStorage.setItem('hkzf_token', body.token)
       !props.location.state
         ? props.history.go(-1)
         : props.history.replace(props.location.state.from.pathname)
     } else {
-      Toast.info(res.description, 2, null, false)
+      Toast.info(description, 2, null, false)
     }
   },
   validationSchema: Yup.object().shape({

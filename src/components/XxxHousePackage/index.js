@@ -133,4 +133,9 @@ class XxxHousePackage extends Component {
   }
 }
 
+// 属性默认值，防止在使用该组件时，不传onSelect，导致报错
+XxxHousePackage.defaultProps = {
+  onSelect: () => {}
+}
+
 export default XxxHousePackage

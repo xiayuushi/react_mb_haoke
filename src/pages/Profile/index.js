@@ -30,11 +30,9 @@ class Profile extends Component {
     }
   }
   getUserInfo = async () => {
-    if (!this.state.isLogin) {
-      return
-    }
-    const token = getToken()
-    const res = await this.$request('/user','get', null, { authorization: token })
+    if (!this.state.isLogin) return
+    
+    const res = await this.$request('/user','get')
     if (res.status === 200) {
       this.setState({ 
         userInfo: {
@@ -44,7 +42,6 @@ class Profile extends Component {
       })
     } else {
       // 登录失败
-      removeToken()
       this.setState({ isLogin: false })
     }
   }
@@ -53,7 +50,7 @@ class Profile extends Component {
     Modal.alert('提示', '是否现在退出登录?', [
       { text: '取消' },
       { text: '确定', onPress: async () => {
-        await this.$request('/user/logout', 'post', null, {authorization: getToken()})
+        await this.$request('/user/logout', 'post')
         removeToken()
         this.setState({
           isLogin: false,
@@ -83,12 +80,12 @@ class Profile extends Component {
           <div className={ styles['myIcon']} >
             <img
               className={ styles['avatar'] }
-              src={ this.state.avatar || DEFAULT_AVATAR }
+              src={ this.state.userInfo.avatar || DEFAULT_AVATAR }
               alt="icon"
             />
           </div>
           <div className={ styles['user'] }>
-            <div className={ styles['name'] }>{ this.state.nickname || '游客' }</div>
+            <div className={ styles['name'] }>{ this.state.userInfo.nickname || '游客' }</div>
             {
               this.state.isLogin ? 
               (
