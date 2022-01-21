@@ -48,16 +48,16 @@ const floorData = [
 export default class RentAdd extends Component {
   constructor(props) {
     super(props)
-
+    const community = {
+      name: props.location.state.name,
+      id: props.location.state.id
+    }
     this.state = {
       // 临时图片地址
       tempSlides: [],
 
       // 小区的名称和id
-      community: {
-        name: '',
-        id: ''
-      },
+      community,
       // 价格
       price: '',
       // 面积
