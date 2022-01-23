@@ -1,12 +1,14 @@
-import { Component } from 'react'
+import { Component, lazy } from 'react'
 import { TabBar } from 'antd-mobile'
 import { Route } from 'react-router-dom'
 
 import styles from './index.module.scss'
-import News from '../News'
-import Index from '../Index'
-import Profile from '../Profile'
-import HouseList from '../HouseList'
+
+// 二级路由懒加载处理
+const News = lazy(() => import('../News'))
+const Index = lazy(() => import('../Index'))
+const Profile = lazy(() => import('../Profile'))
+const HouseList = lazy(() => import('../HouseList'))
 
 const tabDataList = [
   { title: '首页', icon: 'icon-ind', path: '/home' },
